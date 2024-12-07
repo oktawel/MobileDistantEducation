@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <!-- Верхняя панель с иконкой и кнопкой "Войти" -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@android:color/white"
+        android:paddingTop="4dp">
+
+        <ImageView
+            android:id="@+id/iv_profile_icon"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="0dp"
+            android:layout_toStartOf="@+id/btn_login_top"
+            android:contentDescription="Иконка профиля"
+            android:src="@drawable/baseline_account_circle_24"
+            app:tint="@color/light" />
+
+        <Button
+            android:id="@+id/btn_login_top"
+            android:layout_width="112dp"
+            android:layout_height="90dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="4dp"
+            android:backgroundTint="@color/button"
+            android:text="Войти"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/view6"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="8dp"
+        android:background="@color/grey_line"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView11"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="-46dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="447dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_field"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginLeft="45dp"
+            android:layout_marginRight="45dp">
+
+            <TextView
+                android:id="@+id/tv_welcome_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/playfair_display"
+                android:text="Добрый день"
+                android:textColor="@color/black"
+                android:textSize="34sp" />
+
+            <TextView
+                android:id="@+id/tv_welcome_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/playfair_display"
+                android:gravity="center"
+                android:text="Для пользования данным приложением необходима авторизация."
+                android:textColor="#666666"
+                android:textSize="24sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/later_logins"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Прошлые входы"
+            android:layout_marginTop="15dp"
+            android:textColor="@color/black"
+            android:textSize="24sp" />
+
+        <!-- Блок для скроллинга -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1">
+
+
+            <LinearLayout
+                android:id="@+id/ll_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </ScrollView>
+
+
+    </LinearLayout>
+
+<!--    &lt;!&ndash; Кнопка "Авторизоваться" &ndash;&gt;-->
+<!--    <Button-->
+<!--        android:id="@+id/btn_authorize"-->
+<!--        android:layout_width="200dp"-->
+<!--        android:layout_height="48dp"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:layout_marginBottom="32dp"-->
+<!--        android:backgroundTint="@color/button"-->
+<!--        android:text="Авторизоваться"-->
+<!--        android:textColor="@color/white" />-->
+</LinearLayout>

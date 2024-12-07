@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="grey">#979797</color>
+    <color name="grey_line">#D9D9D9</color>
+    <color name="button">#65558F</color>
+    <color name="light">#EADDFF</color>
+    <color name="field_text">#FEF7FF</color>
+    <color name="boxBgColor">#EDE6F0</color>
+    <color name="login_buttons">#6A5F92</color>
+    <color name="redDelete">#CD4B4D</color>
+<!--    <color name="field_text">#FEF7FF</color>-->
+<!--    <color name="field_text">#FEF7FF</color>-->
+<!--    <color name="field_text">#FEF7FF</color>-->
+<!--    <color name="field_text">#FEF7FF</color>-->
+<!--    <color name="field_text">#FEF7FF</color>-->
+<!--    <color name="field_text">#FEF7FF</color>-->
+<!--    <color name="field_text">#FEF7FF</color>-->
+<!--    <color name="field_text">#FEF7FF</color>-->
+<!--    <color name="field_text">#FEF7FF</color>-->
+<!--    <color name="field_text">#FEF7FF</color>-->
+
+</resources>

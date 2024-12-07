@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <!-- Цвет внутренней области (прозрачный фон) -->
+    <solid android:color="@color/login_buttons" />
+
+    <!-- Обводка -->
+    <stroke
+        android:width="0dp"
+        android:color="#B3B3B3" /> <!-- Цвет обводки -->
+
+    <!-- Скругленные углы -->
+    <corners android:radius="50dp" />
+</shape>

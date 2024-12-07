@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@android:color/white"
+        android:paddingTop="4dp">
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="6dp"
+            android:layout_marginBottom="14dp"
+            android:layout_toStartOf="@+id/iv_profile_icon"
+            android:textSize="25sp"
+            android:textColor="@color/black"
+            android:text="User_name"/>
+
+        <ImageView
+            android:id="@+id/iv_profile_icon"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="0dp"
+            android:layout_toStartOf="@+id/btn_exit_acc"
+            android:contentDescription="Иконка профиля"
+            android:src="@drawable/baseline_account_circle_24"
+            app:tint="@color/light" />
+
+        <ImageView
+            android:id="@+id/btn_exit_acc"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="center"
+
+            android:layout_marginEnd="4dp"
+            android:contentDescription="Иконка выхода"
+            android:src="@drawable/baseline_cancel_24"
+            app:tint="@color/button" />
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/view6"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="8dp"
+        android:background="@color/grey_line"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView11"
+        app:layout_constraintVertical_bias="0.0"
+        tools:layout_editor_absoluteX="-46dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="447dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:paddingBottom="50dp">
+
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/playfair_display"
+            android:gravity="center"
+            android:text="Панель администратора"
+            android:textColor="@color/black"
+            android:textSize="34sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/rounded_field"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginTop="20dp">
+
+
+            <Button
+                android:id="@+id/btn_lecturers"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/button"
+                android:text="Список лекторов"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                />
+
+            <Button
+                android:id="@+id/btn_groups"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/button"
+                android:text="Список групп"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:layout_marginVertical="90dp"/>
+
+            <Button
+                android:id="@+id/btn_students"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/button"
+                android:text="Список студентов"
+                android:textColor="@color/white"
+
+                android:textSize="20sp"/>
+
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@android:color/white"
+        android:paddingTop="4dp">
+
+    </RelativeLayout>
+</LinearLayout>
