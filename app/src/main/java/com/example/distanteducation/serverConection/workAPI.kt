@@ -29,4 +29,10 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("id") studentId: Long
     ): Response<Student>
+
+    @GET("backend-1.0-SNAPSHOT/admin/lecturer/{id}")
+    suspend fun getLecturerDetails(
+        @Header("Authorization") token: String,
+        @Path("id") lecurertId: Long
+    ): Response<Lecturer>
 }

@@ -4,7 +4,8 @@
     android:id="@+id/student_info_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/white">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -84,13 +85,117 @@
         app:layout_constraintVertical_bias="0.0"
         tools:layout_editor_absoluteX="-46dp" />
 
-    <Button
-        android:id="@+id/edit_button"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Редактировать"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/button"
-        android:textColor="@android:color/white" />
+        android:layout_height="447dp"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/playfair_display"
+            android:gravity="center_horizontal"
+            android:text="InfoAbout"
+            android:textColor="@color/black"
+            android:textSize="34sp" />
+
+        <TextView
+            android:id="@+id/containerName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_field"
+            android:orientation="vertical"
+            android:text="Name"
+            android:gravity="center_horizontal"
+            android:textSize="20dp"
+            android:layout_marginHorizontal="70dp"
+            android:padding="8dp"
+            android:layout_marginVertical="20dp"/>
+
+        <TextView
+            android:id="@+id/containerSurname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_field"
+            android:orientation="vertical"
+            android:text="Surname"
+            android:gravity="center_horizontal"
+            android:textSize="20dp"
+            android:layout_marginHorizontal="70dp"
+            android:padding="8dp"
+            android:layout_marginVertical="20dp"/>
+
+        <TextView
+            android:id="@+id/containerGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_field"
+            android:orientation="vertical"
+            android:text="Group"
+            android:gravity="center_horizontal"
+            android:textSize="20dp"
+            android:layout_marginHorizontal="70dp"
+            android:padding="8dp"
+            android:layout_marginVertical="20dp"/>
+                <TextView
+            android:id="@+id/containerBDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_field"
+            android:orientation="vertical"
+            android:text="BDate"
+            android:gravity="center_horizontal"
+            android:textSize="20dp"
+            android:layout_marginHorizontal="70dp"
+            android:padding="8dp"
+            android:layout_marginVertical="20dp"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="20dp">
+
+            <TextView
+                android:id="@+id/containerLogin"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_field"
+                android:orientation="vertical"
+                android:text="Login"
+                android:gravity="center_horizontal"
+                android:textSize="20dp"
+                android:padding="8dp" />
+
+            <TextView
+                android:id="@+id/containerPassword"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_field"
+                android:orientation="vertical"
+                android:text="Password"
+                android:gravity="center_horizontal"
+                android:textSize="20dp"
+                android:padding="8dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:gravity="center_horizontal">
+
+        <Button
+            android:id="@+id/edit_button"
+            android:text="Редактировать"
+            android:drawableStart="@drawable/baseline_edit_24"
+            android:drawablePadding="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/button"
+            android:textColor="@color/white" />
+    </RelativeLayout>
 </LinearLayout>
