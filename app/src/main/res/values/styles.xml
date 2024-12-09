@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="SpinnerDropDownInput" parent="android:style/Widget.Spinner">
+        <!-- Размер текста для элементов выпадающего списка -->
+        <item name="android:textSize">20sp</item>
+
+        <!-- Фон для Spinner (с округлыми углами) -->
+        <item name="android:background">@drawable/rounded_field_input</item>
+
+        <!-- Отступы внутри Spinner -->
+        <item name="android:paddingStart">5dp</item>
+        <item name="android:paddingEnd">5dp</item>
+
+        <!-- Высота выпадающего списка -->
+        <item name="android:dropDownHeight">300dp</item>
+
+        <!-- Прозрачный фон для стрелки -->
+        <item name="android:popupBackground">@android:color/white</item>
+    </style>
+</resources>

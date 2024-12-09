@@ -1,0 +1,9 @@
+<!-- res/drawable/spinner_dropdown_border.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/field_text"/> <!-- Белый фон для выпадающего списка -->
+    <stroke android:color="@color/borderInput" android:width="1dp"/> <!-- Рамка (граница) -->
+    <corners
+        android:bottomLeftRadius="10dp"
+        android:bottomRightRadius="10dp"
+        /> <!-- Скругленные углы -->
+</shape>
