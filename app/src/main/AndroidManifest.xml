@@ -18,7 +18,7 @@
         <activity android:name=".ListsActivity" />
         <activity android:name=".InfoActivity" />
         <activity android:name=".AddActivity" />
-
+        <activity android:name=".EditActivity" />
         <activity android:name=".WelcomeActivity"
             android:exported="true">
             <intent-filter>

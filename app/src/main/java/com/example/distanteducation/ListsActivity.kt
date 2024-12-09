@@ -80,6 +80,13 @@ class ListsActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private fun startEdit(id: Long){
+        val intent = Intent(this, EditActivity::class.java)
+        intent.putExtra("type", type)
+        intent.putExtra("Id", id)
+        startActivity(intent)
+    }
+
     private fun loadLecturers() {
         viewTittle.text = "Справочник лекторов"
         btnAdd.text = "Добавить лектора"
@@ -294,7 +301,7 @@ class ListsActivity : AppCompatActivity() {
             })
 
             setOnClickListener {
-                Toast.makeText(context, "Нажата кнопка редактирования", Toast.LENGTH_SHORT).show()
+                startEdit(id)
             }
         }
         return editButton
@@ -318,7 +325,6 @@ class ListsActivity : AppCompatActivity() {
                 setColorFilter(ContextCompat.getColor(context, R.color.button))
             })
             setOnClickListener {
-
                 when (type) {
                     "lecturer" -> deleteLecturer(id)
                     "student" -> deleteStudent(id)

@@ -6,6 +6,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface ApiService {
@@ -79,4 +80,23 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("id") groupId: Long
     ): Response<Unit>
+
+    @POST("backend-1.0-SNAPSHOT/admin/student/update")
+    suspend fun updateStudent(
+        @Header("Authorization") token: String,
+        @Body studentRequest: StudentRequestUpdate
+    ): Response<Unit>
+
+    @POST("backend-1.0-SNAPSHOT/admin/lecturer/update")
+    suspend fun updateLecturer(
+        @Header("Authorization") token: String,
+        @Body lecturerRequest: LecturerRequestUpdate
+    ): Response<Unit>
+
+    @POST("backend-1.0-SNAPSHOT/admin/group/update")
+    suspend fun updateGroup(
+        @Header("Authorization") token: String,
+        @Body groupRequest: GroupRequestUpdate
+    ): Response<Unit>
+
 }

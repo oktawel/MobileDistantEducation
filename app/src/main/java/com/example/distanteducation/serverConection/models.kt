@@ -44,8 +44,29 @@ data class StudentRequest(
 )
 data class LecturerRequest(
     val name: String,
-    val surname: String,
+    val surname: String
 )
 data class GroupRequest(
+    val name: String
+)
+
+data class StudentRequestUpdate(
+    val id: Long,
+    val login: String,
+    val password: String,
     val name: String,
+    val surname: String,
+    val birthDate: String,
+    val groupId: Long
+)
+data class LecturerRequestUpdate(
+    val id: Long,
+    val login: String,
+    val password: String,
+    val name: String,
+    val surname: String
+)
+data class GroupRequestUpdate(
+    val id: Long,
+    val name: String
 )
