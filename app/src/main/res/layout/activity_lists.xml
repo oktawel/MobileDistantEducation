@@ -105,7 +105,7 @@
         android:layout_marginHorizontal="20dp">
 
         <LinearLayout
-            android:id="@+id/containerLecturers"
+            android:id="@+id/containerList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"

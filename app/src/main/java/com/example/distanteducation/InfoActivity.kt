@@ -3,12 +3,10 @@ package com.example.distanteducation
 import com.example.distanteducation.serverConection.Student
 
 import android.os.Bundle
-import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.transition.Visibility
 import com.example.distanteducation.functions.LogoutHelper
+import com.example.distanteducation.serverConection.Group
 import com.example.distanteducation.serverConection.Lecturer
 import com.example.distanteducation.serverConection.RetrofitClient
 import com.example.distanteducation.serverConection.UserSession
@@ -28,7 +26,6 @@ class InfoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_info)
 
         val token = UserSession.token
         if (token == null) {
@@ -37,19 +34,39 @@ class InfoActivity : AppCompatActivity() {
             return
         }
 
-        tTittle = findViewById(R.id.title)
-        tName = findViewById(R.id.containerName)
-        tSurname = findViewById(R.id.containerSurname)
-        tGroup = findViewById(R.id.containerGroup)
-        tBDate = findViewById(R.id.containerBDate)
-        tLogin = findViewById(R.id.containerLogin)
-        tPassword = findViewById(R.id.containerPassword)
-
-        val editButton = findViewById<Button>(R.id.edit_button)
-
         val Id = intent.getLongExtra("Id", 0L)
         val type = intent.getStringExtra("type")
 
+
+        when (type) {
+            "lecturer" -> {
+                setContentView(R.layout.activity_info_lecturer)
+                tTittle = findViewById(R.id.title)
+                tName = findViewById(R.id.containerName)
+                tSurname = findViewById(R.id.containerSurname)
+                tLogin = findViewById(R.id.containerLogin)
+                tPassword = findViewById(R.id.containerPassword)
+                loadLecturerDetails(Id)
+            }
+            "student" -> {
+                setContentView(R.layout.activity_info_student)
+                tTittle = findViewById(R.id.title)
+                tName = findViewById(R.id.containerName)
+                tSurname = findViewById(R.id.containerSurname)
+                tGroup = findViewById(R.id.containerGroup)
+                tBDate = findViewById(R.id.containerBDate)
+                tLogin = findViewById(R.id.containerLogin)
+                tPassword = findViewById(R.id.containerPassword)
+                loadStudentDetails(Id)
+            }
+            "group" -> {
+                setContentView(R.layout.activity_info_group)
+                tTittle = findViewById(R.id.title)
+                tName = findViewById(R.id.containerName)
+                loadGroupDetails(Id)
+            }
+        }
+        val editButton = findViewById<Button>(R.id.edit_button)
         val userName: TextView = findViewById(R.id.user_name)
 
         userName.text = UserSession.user!!.name
@@ -70,18 +87,31 @@ class InfoActivity : AppCompatActivity() {
             return
         }
 
-        when (type) {
-            "lecturer" -> {
-                loadLecturerDetails(Id)
-            }
-            "student" -> {
-                loadStudentDetails(Id)
-            }
-            "group" -> {
+    }
 
+    private fun loadGroupDetails(Id: Long) {
+        val apiService = RetrofitClient.apiService
+        tTittle.text = "Информация о группе"
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = apiService.getGroupDetails(
+                    token = "Bearer ${UserSession.token}",
+                    grouptId = Id
+                )
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful && response.body() != null) {
+                        val group = response.body()!!
+                        displayGrouprInfo(group)
+                    } else {
+                        Toast.makeText(this@InfoActivity, "Ошибка загрузки данных", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@InfoActivity, "Ошибка: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
             }
         }
-
     }
 
     private fun loadLecturerDetails(Id: Long) {
@@ -134,6 +164,9 @@ class InfoActivity : AppCompatActivity() {
         }
     }
 
+    private fun displayGrouprInfo(group: Group) {
+        tName.text = group.name
+    }
     private fun displayStudentInfo(student: Student) {
         tName.text = student.name
         tSurname.text = student.surname
@@ -146,8 +179,6 @@ class InfoActivity : AppCompatActivity() {
 
         tName.text = lecturer.name
         tSurname.text = lecturer.surname
-        tGroup.visibility = View.INVISIBLE
-        tBDate.visibility = View.INVISIBLE
         tLogin.text = lecturer.userLogin
         tPassword.text = lecturer.userPassword
     }

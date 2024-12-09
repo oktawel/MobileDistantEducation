@@ -1,7 +1,9 @@
 package com.example.distanteducation
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -23,23 +25,21 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ListsActivity : AppCompatActivity() {
+    private lateinit var btnAdd: Button
+    private lateinit var viewTittle: TextView
+    private lateinit var type: String
+    private lateinit var container: LinearLayout
+    private lateinit var token: String
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_lecturers)
+        setContentView(R.layout.activity_lists)
 
-        val container = findViewById<LinearLayout>(R.id.containerLecturers)
-        val btnAdd = findViewById<Button>(R.id.btnAdd)
-        val viewTittle = findViewById<TextView>(R.id.tvTitle)
-
-        val token = UserSession.token
-        if (token == null) {
-            Toast.makeText(this, "Ошибка: пользователь не авторизован", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
-
-        val type = intent.getStringExtra("type")
+        btnAdd = findViewById(R.id.btnAdd)
+        viewTittle = findViewById(R.id.tvTitle)
+        token = UserSession.token ?: return
+        type = intent.getStringExtra("type") ?: return
 
         val userName: TextView = findViewById(R.id.user_name)
 
@@ -54,27 +54,37 @@ class ListsActivity : AppCompatActivity() {
             finish()
         }
 
-        when (type) {
-            "lecturer" -> {
-                loadLecturers(type, container, token, btnAdd, viewTittle)
-            }
-            "student" -> {
-                loadStudents(type, container, token, btnAdd, viewTittle)
-            }
-            "group" -> {
-                loadGroups(type, container, token, btnAdd, viewTittle)
-            }
-        }
-
-
-
+        loadData()
     }
 
-    private fun loadLecturers(type: String, container: LinearLayout, token: String, btnAdd:Button, viewTittle:TextView) {
+
+    override fun onResume() {
+        super.onResume()
+        loadData()
+    }
+
+
+    private fun loadData() {
+        container = findViewById<LinearLayout>(R.id.containerList)
+
+        when (type) {
+            "lecturer" -> loadLecturers()
+            "student" -> loadStudents()
+            "group" -> loadGroups()
+        }
+    }
+
+    private fun startAdd(){
+        val intent = Intent(this, AddActivity::class.java)
+        intent.putExtra("type", type)
+        startActivity(intent)
+    }
+
+    private fun loadLecturers() {
         viewTittle.text = "Справочник лекторов"
         btnAdd.text = "Добавить лектора"
         btnAdd.setOnClickListener {
-            Toast.makeText(this, "Функция добавления лектора!", Toast.LENGTH_SHORT).show()
+            startAdd()
         }
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -86,7 +96,7 @@ class ListsActivity : AppCompatActivity() {
                     withContext(Dispatchers.Main) {
                         container.removeAllViews()
                         for (lecturer in lecturers) {
-                            addListLecturersView(type, container, lecturer)
+                            addListLecturersView(lecturer)
                         }
                     }
                 } else {
@@ -110,11 +120,11 @@ class ListsActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadStudents(type: String, container: LinearLayout, token: String, btnAdd:Button, viewTittle:TextView) {
+    private fun loadStudents() {
         viewTittle.text = "Справочник студентов"
         btnAdd.text = "Добавить студента"
         btnAdd.setOnClickListener {
-            Toast.makeText(this, "Функция добавления студента!", Toast.LENGTH_SHORT).show()
+            startAdd()
         }
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -126,7 +136,7 @@ class ListsActivity : AppCompatActivity() {
                     withContext(Dispatchers.Main) {
                         container.removeAllViews()
                         for (student in students) {
-                            addListStudentsView(type, container, student)
+                            addListStudentsView(student)
                         }
                     }
                 } else {
@@ -150,12 +160,11 @@ class ListsActivity : AppCompatActivity() {
         }
     }
 
-
-    private fun loadGroups(type: String, container: LinearLayout, token: String, btnAdd:Button, viewTittle:TextView) {
+    private fun loadGroups() {
         viewTittle.text = "Справочник групп"
         btnAdd.text = "Добавить группу"
         btnAdd.setOnClickListener {
-            Toast.makeText(this, "Функция добавления группы!", Toast.LENGTH_SHORT).show()
+            startAdd()
         }
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -167,7 +176,7 @@ class ListsActivity : AppCompatActivity() {
                     withContext(Dispatchers.Main) {
                         container.removeAllViews()
                         for (group in groups) {
-                            addListGroupsView(type, container, group)
+                            addListGroupsView(group)
                         }
                     }
                 } else {
@@ -192,26 +201,12 @@ class ListsActivity : AppCompatActivity() {
     }
 
 
-    private fun addListLecturersView(type: String, container: LinearLayout, lecturer: Lecturer) {
-        val lecturerLayout = createLayout(lecturer.id, type)
+    private fun addListLecturersView(lecturer: Lecturer) {
+        val lecturerLayout = createLayout(lecturer.id)
 
-        val textView = createTextField(lecturer.id, lecturer.name, lecturer.surname, type)
-        val editButton = createBtnEdit(lecturer.id, type)
-        val deleteButton = createBtnDelete(lecturer.id, type)
-
-        lecturerLayout.addView(textView)
-        lecturerLayout.addView(editButton)
-        lecturerLayout.addView(deleteButton)
-
-        container.addView(lecturerLayout)
-    }
-
-    private fun addListStudentsView(type: String, container: LinearLayout, student: Student) {
-        val lecturerLayout = createLayout(student.id, type)
-
-        val textView = createTextField(student.id, student.name, student.surname, type)
-        val editButton = createBtnEdit(student.id, type)
-        val deleteButton = createBtnDelete(student.id, type)
+        val textView = createTextField(lecturer.id, lecturer.name, lecturer.surname)
+        val editButton = createBtnEdit(lecturer.id)
+        val deleteButton = createBtnDelete(lecturer.id)
 
         lecturerLayout.addView(textView)
         lecturerLayout.addView(editButton)
@@ -220,12 +215,26 @@ class ListsActivity : AppCompatActivity() {
         container.addView(lecturerLayout)
     }
 
-    private fun addListGroupsView(type: String, container: LinearLayout, group: Group) {
-        val lecturerLayout = createLayout(group.id, type)
+    private fun addListStudentsView(student: Student) {
+        val lecturerLayout = createLayout(student.id)
 
-        val textView = createTextField(group.id, group.name, "", type)
-        val editButton = createBtnEdit(group.id, type)
-        val deleteButton = createBtnDelete(group.id, type)
+        val textView = createTextField(student.id, student.name, student.surname)
+        val editButton = createBtnEdit(student.id)
+        val deleteButton = createBtnDelete(student.id)
+
+        lecturerLayout.addView(textView)
+        lecturerLayout.addView(editButton)
+        lecturerLayout.addView(deleteButton)
+
+        container.addView(lecturerLayout)
+    }
+
+    private fun addListGroupsView(group: Group) {
+        val lecturerLayout = createLayout(group.id)
+
+        val textView = createTextField(group.id, group.name, "")
+        val editButton = createBtnEdit(group.id)
+        val deleteButton = createBtnDelete(group.id)
 
         lecturerLayout.addView(textView)
         lecturerLayout.addView(editButton)
@@ -236,7 +245,7 @@ class ListsActivity : AppCompatActivity() {
 
 
 
-    private fun createLayout(id:Long, type:String): LinearLayout {
+    private fun createLayout(id:Long): LinearLayout {
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             layoutParams = LinearLayout.LayoutParams(
@@ -256,7 +265,7 @@ class ListsActivity : AppCompatActivity() {
         return layout
     }
 
-    private fun createTextField(id:Long, name:String, surname:String, type:String): TextView {
+    private fun createTextField(id:Long, name:String, surname:String,): TextView {
         val textView = TextView(this).apply {
             text = "${name} ${surname}"
             textSize = 20f
@@ -266,7 +275,7 @@ class ListsActivity : AppCompatActivity() {
         return textView
     }
 
-    private fun createBtnEdit(id:Long, type:String): CardView {
+    private fun createBtnEdit(id:Long): CardView {
         val editButton = CardView(this).apply {
             layoutParams = LinearLayout.LayoutParams(100, 100).apply {
                 setMargins(16, 16, 16, 16)
@@ -291,7 +300,7 @@ class ListsActivity : AppCompatActivity() {
         return editButton
     }
 
-    private fun createBtnDelete(id:Long, type:String): CardView {
+    private fun createBtnDelete(id:Long): CardView {
         val deleteButton = CardView(this).apply {
             layoutParams = LinearLayout.LayoutParams(100, 100).apply {
                 setMargins(16, 16, 16, 16)
@@ -309,10 +318,151 @@ class ListsActivity : AppCompatActivity() {
                 setColorFilter(ContextCompat.getColor(context, R.color.button))
             })
             setOnClickListener {
-                Toast.makeText(this@ListsActivity, "Нажата кнопка удаления", Toast.LENGTH_SHORT).show()
+
+                when (type) {
+                    "lecturer" -> deleteLecturer(id)
+                    "student" -> deleteStudent(id)
+                    "group" -> deleteGroup(id)
+                }
             }
         }
         return deleteButton
     }
+
+
+
+    private fun deleteStudent(studentId: Long) {
+        AlertDialog.Builder(this)
+            .setTitle("Удаление студента")
+            .setMessage("Вы уверены, что хотите удалить студента?")
+            .setPositiveButton("Да") { _, _ ->
+                val apiService = RetrofitClient.apiService
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val response = apiService.deleteStudent(
+                            token = "Bearer ${UserSession.token}",
+                            studentId = studentId
+                        )
+                        withContext(Dispatchers.Main) {
+                            if (response.isSuccessful) {
+                                Toast.makeText(
+                                    this@ListsActivity,
+                                    "Студент успешно удалён",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                loadStudents()
+                            } else {
+                                Toast.makeText(
+                                    this@ListsActivity,
+                                    "Ошибка удаления студента",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                this@ListsActivity,
+                                "Ошибка: ${e.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
+    }
+
+    private fun deleteLecturer(lecturerId: Long) {
+        AlertDialog.Builder(this)
+            .setTitle("Удаление лектора")
+            .setMessage("Вы уверены, что хотите удалить лектора?")
+            .setPositiveButton("Да") { _, _ ->
+                val apiService = RetrofitClient.apiService
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val response = apiService.deleteLecturer(
+                            token = "Bearer ${UserSession.token}",
+                            lecturerId = lecturerId
+                        )
+                        withContext(Dispatchers.Main) {
+                            if (response.isSuccessful) {
+                                Toast.makeText(
+                                    this@ListsActivity,
+                                    "Лектор успешно удалён",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                loadLecturers()
+                            } else {
+                                Toast.makeText(
+                                    this@ListsActivity,
+                                    "Ошибка удаления лектора",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                this@ListsActivity,
+                                "Ошибка: ${e.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
+    }
+
+    private fun deleteGroup(groupId: Long) {
+        AlertDialog.Builder(this)
+            .setTitle("Удаление группы")
+            .setMessage("Вы уверены, что хотите удалить группу?")
+            .setPositiveButton("Да") { _, _ ->
+                val apiService = RetrofitClient.apiService
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val response = apiService.deleteGroup(
+                            token = "Bearer ${UserSession.token}",
+                            groupId = groupId
+                        )
+                        withContext(Dispatchers.Main) {
+                            if (response.isSuccessful) {
+                                Toast.makeText(
+                                    this@ListsActivity,
+                                    "Группа успешно удалёна",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                loadGroups()
+                            } else {
+                                Toast.makeText(
+                                    this@ListsActivity,
+                                    "Ошибка удаления группы",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    } catch (e: Exception) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(
+                                this@ListsActivity,
+                                "Ошибка: ${e.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
+    }
+
+
 }
 

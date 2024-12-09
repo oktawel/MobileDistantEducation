@@ -17,6 +17,7 @@
         <activity android:name=".AdminActivity" />
         <activity android:name=".ListsActivity" />
         <activity android:name=".InfoActivity" />
+        <activity android:name=".AddActivity" />
 
         <activity android:name=".WelcomeActivity"
             android:exported="true">

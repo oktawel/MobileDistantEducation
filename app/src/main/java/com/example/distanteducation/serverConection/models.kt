@@ -35,3 +35,17 @@ data class Group(
     val id: Long,
     val name: String,
 )
+
+data class StudentRequest(
+    val name: String,
+    val surname: String,
+    val birthDate: String,
+    val groupId: Long
+)
+data class LecturerRequest(
+    val name: String,
+    val surname: String,
+)
+data class GroupRequest(
+    val name: String,
+)

@@ -2,6 +2,7 @@ package com.example.distanteducation.serverConection
 
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -35,4 +36,47 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("id") lecurertId: Long
     ): Response<Lecturer>
+
+    @GET("backend-1.0-SNAPSHOT/admin/group/{id}")
+    suspend fun getGroupDetails(
+        @Header("Authorization") token: String,
+        @Path("id") grouptId: Long
+    ): Response<Group>
+
+    @POST("backend-1.0-SNAPSHOT/admin/student/add")
+    suspend fun addStudent(
+        @Header("Authorization") token: String,
+        @Body studentRequest: StudentRequest
+    ): Response<Void>
+
+    @POST("backend-1.0-SNAPSHOT/admin/lecturer/add")
+    suspend fun addLecturer(
+        @Header("Authorization") token: String,
+        @Body lecturerRequest: LecturerRequest
+    ): Response<Void>
+
+    @POST("backend-1.0-SNAPSHOT/admin/group/add")
+    suspend fun addGroup(
+        @Header("Authorization") token: String,
+        @Body groupRequest: GroupRequest
+    ): Response<Void>
+
+
+    @DELETE("backend-1.0-SNAPSHOT/admin/student/delete/{id}")
+    suspend fun deleteStudent(
+        @Header("Authorization") token: String,
+        @Path("id") studentId: Long
+    ): Response<Unit>
+
+    @DELETE("backend-1.0-SNAPSHOT/admin/lecturer/delete/{id}")
+    suspend fun deleteLecturer(
+        @Header("Authorization") token: String,
+        @Path("id") lecturerId: Long
+    ): Response<Unit>
+
+    @DELETE("backend-1.0-SNAPSHOT/admin/group/delete/{id}")
+    suspend fun deleteGroup(
+        @Header("Authorization") token: String,
+        @Path("id") groupId: Long
+    ): Response<Unit>
 }
