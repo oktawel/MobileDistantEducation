@@ -8,6 +8,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
 
@@ -99,4 +100,10 @@ interface ApiService {
         @Body groupRequest: GroupRequestUpdate
     ): Response<Unit>
 
+    @GET("backend-1.0-SNAPSHOT/admin/groupsByName")
+    suspend fun getGroupByName(@Header("Authorization") token: String,
+                               @Query("name") name: String): Response<GroupWithCourses>
+
+    @GET("backend-1.0-SNAPSHOT/courses")
+    suspend fun getAllCourses(@Header("Authorization") token: String): Response<List<Course>>
 }

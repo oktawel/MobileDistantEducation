@@ -36,6 +36,12 @@ data class Group(
     val name: String,
 )
 
+data class GroupWithCourses(
+    val id: Long,
+    val name: String,
+    val listCourses: Course
+)
+
 data class StudentRequest(
     val name: String,
     val surname: String,
@@ -69,4 +75,14 @@ data class LecturerRequestUpdate(
 data class GroupRequestUpdate(
     val id: Long,
     val name: String
+)
+
+
+data class Course(
+    val id: Long,
+    val name: String,
+    val description: String,
+    val lecturerName: String,
+    val lecturerSurname: String,
+    val groups: List<Group>
 )

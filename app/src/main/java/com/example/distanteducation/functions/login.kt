@@ -9,7 +9,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.example.distanteducation.AdminActivity
 import com.example.distanteducation.DB.UserDatabaseHelper
+import com.example.distanteducation.ListCourses
 import com.example.distanteducation.WelcomeActivity
+import com.example.distanteducation.serverConection.Course
 import com.example.distanteducation.serverConection.LoginRequest
 import com.example.distanteducation.serverConection.RetrofitClient
 import com.example.distanteducation.serverConection.UserResponse
@@ -68,12 +70,23 @@ object LoginHelper {
                     "Lector" -> {
                         saveInDatabase(activity, login, password, user.name!!, user.surname!!)
                         UserSession.user = user
-                        println("Вы выбрали вариант 2")
+
+                        val intent = Intent(activity, ListCourses::class.java)
+                        activity.startActivity(intent)
                     }
                     "Student" -> {
                         saveInDatabase(activity, login, password, user.name!!, user.surname!!)
                         UserSession.user = user
-                        println("Вы выбрали вариант 3")
+
+                        val response = apiService.getStudentDetails(
+                            token = "Bearer ${UserSession.token}",
+                            studentId = user.id!!
+                        )
+
+                        UserSession.studentGroup = response.body()!!.group
+
+                        val intent = Intent(activity, ListCourses::class.java)
+                        activity.startActivity(intent)
                     }
                     else -> {
                         // Это выполняется, если ни один из вариантов не подходит
