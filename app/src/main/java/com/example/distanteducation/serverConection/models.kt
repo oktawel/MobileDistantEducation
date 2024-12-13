@@ -15,15 +15,15 @@ data class UserResponse(
     var name: String?,
     var surname: String?
 )
-
+@Parcelize
 data class Lecturer(
     val id: Long,
     val name: String,
     val surname: String,
     val userLogin: String,
     val userPassword: String
-)
-
+): Parcelable
+@Parcelize
 data class Student(
     val id: Long,
     val name: String,
@@ -32,7 +32,7 @@ data class Student(
     val birthDate: String,
     val userLogin: String,
     val userPassword: String
-)
+): Parcelable
 @Parcelize
 data class Group(
     val id: Long,
@@ -102,6 +102,7 @@ data class CourseRequestUpdate(
     val lecturerId: Long
 )
 
+@Parcelize
 data class Test (
     val id: Long,
     val name: String,
@@ -109,4 +110,4 @@ data class Test (
     val open: Boolean,
     val mark: Float,
     val subjectId: Long
-)
+): Parcelable

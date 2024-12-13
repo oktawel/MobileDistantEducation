@@ -26,6 +26,8 @@
         <activity android:name=".EditCourseActivity" />
         <activity android:name=".InfoCourse" />
 
+        <activity android:name=".InfoTestActivity" />
+
         <activity android:name=".WelcomeActivity"
             android:exported="true">
             <intent-filter>

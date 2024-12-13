@@ -1,6 +1,7 @@
 package com.example.distanteducation
 
 import android.app.DatePickerDialog
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.*
@@ -8,10 +9,13 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.distanteducation.functions.LogoutHelper
 import com.example.distanteducation.serverConection.Group
 import com.example.distanteducation.serverConection.GroupRequestUpdate
+import com.example.distanteducation.serverConection.Lecturer
 import com.example.distanteducation.serverConection.LecturerRequestUpdate
 import com.example.distanteducation.serverConection.RetrofitClient
+import com.example.distanteducation.serverConection.Student
 import com.example.distanteducation.serverConection.StudentRequest
 import com.example.distanteducation.serverConection.StudentRequestUpdate
+import com.example.distanteducation.serverConection.Test
 import com.example.distanteducation.serverConection.UserSession
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +37,7 @@ class EditActivity : AppCompatActivity() {
     private lateinit var btnEdit: Button
     private lateinit var type: String
 
-    private var groupsMap: Map<String, Long> = emptyMap()
+    private var groupsList: List<Group> = emptyList()
 
     private var Id: Long = 0
 
@@ -42,7 +46,7 @@ class EditActivity : AppCompatActivity() {
 
 
         type = intent.getStringExtra("type") ?: return
-        Id = intent.getLongExtra("Id", 0)
+
 
         when (type) {
             "lecturer" -> {
@@ -52,7 +56,16 @@ class EditActivity : AppCompatActivity() {
                 editLogin = findViewById(R.id.editLogin)
                 editPassword = findViewById(R.id.editPassword)
                 btnEdit = findViewById(R.id.btnEdit)
-                loadLecturerData(Id)
+
+                val lecturer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra("Lecturer", Lecturer::class.java)
+                } else {
+                    intent.getParcelableExtra("Lecturer")
+                }
+                loadLecturerData(lecturer!!)
+
+                Id = lecturer.id
+
                 btnEdit.setOnClickListener {
                     updateLecturer()
                 }
@@ -66,8 +79,19 @@ class EditActivity : AppCompatActivity() {
                 editLogin = findViewById(R.id.editLogin)
                 editPassword = findViewById(R.id.editPassword)
                 btnEdit = findViewById(R.id.btnEdit)
-                loadStudentData(Id)
-                loadGroups()
+
+                val student = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra("Student", Student::class.java)
+                } else {
+                    intent.getParcelableExtra("Student")
+                }
+
+                loadGroups(student!!.group)
+
+                loadStudentData(student)
+
+                Id = student.id
+
                 btnEdit.setOnClickListener {
                     updateStudent()
                 }
@@ -79,7 +103,16 @@ class EditActivity : AppCompatActivity() {
                 setContentView(R.layout.activity_update_group)
                 editName = findViewById(R.id.editName)
                 btnEdit = findViewById(R.id.btnEdit)
-                loadGroupData(Id)
+
+                val group = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra("Group", Group::class.java)
+                } else {
+                    intent.getParcelableExtra("Group")
+                }
+                loadGroupData(group!!)
+
+                Id = group.id
+
                 btnEdit.setOnClickListener {
                     updateGroup()
                 }
@@ -98,112 +131,30 @@ class EditActivity : AppCompatActivity() {
         btnBack.setOnClickListener {
             finish()
         }
+    }
+
+    private fun loadLecturerData(lecturer: Lecturer) {
+        editName.setText(lecturer.name)
+        editSurname.setText(lecturer.surname)
+        editLogin.setText(lecturer.userLogin)
+        editPassword.setText(lecturer.userPassword)
 
     }
 
-    private fun loadLecturerData(lecturerId: Long) {
-        val apiService = RetrofitClient.apiService
-
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = apiService.getLecturerDetails(
-                    token = "Bearer ${UserSession.token}",
-                    lecurertId = lecturerId
-                )
-
-                if (response.isSuccessful && response.body() != null) {
-                    val lecturer = response.body()!!
-
-                    withContext(Dispatchers.Main) {
-                        editName.setText(lecturer.name)
-                        editSurname.setText(lecturer.surname)
-                        editLogin.setText(lecturer.userLogin)
-                        editPassword.setText(lecturer.userPassword)
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(this@EditActivity, "Ошибка получения данных", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(this@EditActivity, "Ошибка: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
+    private fun loadStudentData(student: Student) {
+        editName.setText(student.name)
+        editSurname.setText(student.surname)
+        editBirthDate.setText(student.birthDate)
+        editLogin.setText(student.userLogin)
+        editPassword.setText(student.userPassword)
     }
 
-    private fun loadStudentData(studentId: Long) {
-        val apiService = RetrofitClient.apiService
-
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = apiService.getStudentDetails(
-                    token = "Bearer ${UserSession.token}",
-                    studentId = studentId
-                )
-
-                if (response.isSuccessful && response.body() != null) {
-                    val student = response.body()!!
-
-                    withContext(Dispatchers.Main) {
-                        editName.setText(student.name)
-                        editSurname.setText(student.surname)
-                        editBirthDate.setText(student.birthDate)
-                        editLogin.setText(student.userLogin)
-                        editPassword.setText(student.userPassword)
-
-                        val groupName = student.group
-
-                        if (groupsMap.containsKey(groupName)) {
-                            val groupIndex = groupsMap.keys.indexOf(groupName)
-                            spinnerGroup.setSelection(groupIndex)
-                        }
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(this@EditActivity, "Ошибка получения данных студента", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(this@EditActivity, "Ошибка: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-    }
-
-    private fun loadGroupData(groupId: Long) {
-        val apiService = RetrofitClient.apiService
-
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = apiService.getGroupDetails(
-                    token = "Bearer ${UserSession.token}",
-                    grouptId = groupId
-                )
-
-                if (response.isSuccessful && response.body() != null) {
-                    val group = response.body()!!
-
-                    withContext(Dispatchers.Main) {
-                        editName.setText(group.name)
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(this@EditActivity, "Ошибка получения данных", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(this@EditActivity, "Ошибка: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
+    private fun loadGroupData(group: Group) {
+        editName.setText(group.name)
     }
 
 
-    private fun loadGroups() {
+    private fun loadGroups(selectedGroupName: String? = null) {
         val apiService = RetrofitClient.apiService
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -214,15 +165,24 @@ class EditActivity : AppCompatActivity() {
                     if (response.isSuccessful && response.body() != null) {
                         val groups = response.body()!!
 
-                        groupsMap = groups.associate { it.name to it.id }
+                        groupsList = groups
+
+                        val groupNames = groupsList.map { it.name }
 
                         val adapter = ArrayAdapter(
                             this@EditActivity,
                             android.R.layout.simple_spinner_item,
-                            groupsMap.keys.toList()
+                            groupNames
                         )
                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                         spinnerGroup.adapter = adapter
+
+                        selectedGroupName?.let {
+                            val groupIndex = groupNames.indexOf(it)
+                            if (groupIndex != -1) {
+                                spinnerGroup.setSelection(groupIndex)
+                            }
+                        }
                     } else {
                         Toast.makeText(this@EditActivity, "Ошибка загрузки групп", Toast.LENGTH_SHORT).show()
                     }
@@ -235,15 +195,15 @@ class EditActivity : AppCompatActivity() {
         }
     }
 
+
     private fun updateStudent() {
         val name = editName.text.toString().trim()
         val surname = editSurname.text.toString().trim()
         val birthDate = editBirthDate.text.toString().trim()
         val login = editLogin.text.toString().trim()
         val password = editPassword.text.toString().trim()
-
         val selectedGroupName = spinnerGroup.selectedItem as String
-        val groupId = groupsMap[selectedGroupName]
+        val groupId = groupsList.find { it.name == selectedGroupName }?.id
 
         if (name.isEmpty() || surname.isEmpty() || birthDate.isEmpty() || login.isEmpty() || password.isEmpty() || groupId == null) {
             Toast.makeText(this, "Заполните все поля", Toast.LENGTH_SHORT).show()

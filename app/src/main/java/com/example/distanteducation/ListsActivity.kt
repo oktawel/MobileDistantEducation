@@ -80,10 +80,25 @@ class ListsActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun startEdit(id: Long){
+    private fun startEditLecturer(lecturer: Lecturer){
         val intent = Intent(this, EditActivity::class.java)
         intent.putExtra("type", type)
-        intent.putExtra("Id", id)
+        intent.putExtra("Lecturer", lecturer)
+        startActivity(intent)
+    }
+
+    private fun startEditGroup(group: Group){
+        val intent = Intent(this, EditActivity::class.java)
+        intent.putExtra("type", type)
+        intent.putExtra("Group", group)
+
+        startActivity(intent)
+    }
+
+    private fun startEditStudent(student: Student){
+        val intent = Intent(this, EditActivity::class.java)
+        intent.putExtra("type", type)
+        intent.putExtra("Student", student)
         startActivity(intent)
     }
 
@@ -212,7 +227,7 @@ class ListsActivity : AppCompatActivity() {
         val lecturerLayout = createLayout(lecturer.id)
 
         val textView = createTextField(lecturer.id, lecturer.name, lecturer.surname)
-        val editButton = createBtnEdit(lecturer.id)
+        val editButton = createBtnEditLecturer(lecturer)
         val deleteButton = createBtnDelete(lecturer.id)
 
         lecturerLayout.addView(textView)
@@ -226,7 +241,7 @@ class ListsActivity : AppCompatActivity() {
         val lecturerLayout = createLayout(student.id)
 
         val textView = createTextField(student.id, student.name, student.surname)
-        val editButton = createBtnEdit(student.id)
+        val editButton = createBtnEditStudent(student)
         val deleteButton = createBtnDelete(student.id)
 
         lecturerLayout.addView(textView)
@@ -240,7 +255,7 @@ class ListsActivity : AppCompatActivity() {
         val lecturerLayout = createLayout(group.id)
 
         val textView = createTextField(group.id, group.name, "")
-        val editButton = createBtnEdit(group.id)
+        val editButton = createBtnEditGroup(group)
         val deleteButton = createBtnDelete(group.id)
 
         lecturerLayout.addView(textView)
@@ -282,7 +297,7 @@ class ListsActivity : AppCompatActivity() {
         return textView
     }
 
-    private fun createBtnEdit(id:Long): CardView {
+    private fun createBtnEditLecturer(lecturer: Lecturer): CardView {
         val editButton = CardView(this).apply {
             layoutParams = LinearLayout.LayoutParams(100, 100).apply {
                 setMargins(16, 16, 16, 16)
@@ -301,7 +316,57 @@ class ListsActivity : AppCompatActivity() {
             })
 
             setOnClickListener {
-                startEdit(id)
+                startEditLecturer(lecturer)
+            }
+        }
+        return editButton
+    }
+
+    private fun createBtnEditGroup(group: Group): CardView {
+        val editButton = CardView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(100, 100).apply {
+                setMargins(16, 16, 16, 16)
+            }
+            radius = 75f
+            cardElevation = 10f
+            setCardBackgroundColor(ContextCompat.getColor(context, R.color.field_text))
+            addView(ImageView(context).apply {
+                setImageResource(R.drawable.baseline_edit_24)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                )
+                scaleType = ImageView.ScaleType.CENTER_INSIDE
+                setColorFilter(ContextCompat.getColor(context, R.color.button))
+            })
+
+            setOnClickListener {
+                startEditGroup(group)
+            }
+        }
+        return editButton
+    }
+
+    private fun createBtnEditStudent(student: Student): CardView {
+        val editButton = CardView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(100, 100).apply {
+                setMargins(16, 16, 16, 16)
+            }
+            radius = 75f
+            cardElevation = 10f
+            setCardBackgroundColor(ContextCompat.getColor(context, R.color.field_text))
+            addView(ImageView(context).apply {
+                setImageResource(R.drawable.baseline_edit_24)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                )
+                scaleType = ImageView.ScaleType.CENTER_INSIDE
+                setColorFilter(ContextCompat.getColor(context, R.color.button))
+            })
+
+            setOnClickListener {
+                startEditStudent(student)
             }
         }
         return editButton

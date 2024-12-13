@@ -75,11 +75,17 @@ class InfoCourse : AppCompatActivity() {
 
         tTittle.text = course.name
         tDescription.text = course.description
-        btnAdd.text = "Добавить тест"
-        btnAdd.setOnClickListener {
-            startAdd()
-        }
 
+        if (UserSession.user!!.role == "Lector"){
+            btnAdd.visibility = View.VISIBLE
+            btnAdd.text = "Добавить тест"
+            btnAdd.setOnClickListener {
+                startAdd()
+            }
+        }
+        else{
+            btnAdd.visibility = View.GONE
+        }
         loadData()
     }
 
@@ -160,8 +166,6 @@ class InfoCourse : AppCompatActivity() {
 
     private fun addListTestView(test: Test) {
         if (UserSession.user!!.role == "Lector"){
-            btnAdd.visibility = View.VISIBLE
-
             val testLayout = createLayout(test)
 
             val textView = createTextField(test.name)
@@ -178,7 +182,6 @@ class InfoCourse : AppCompatActivity() {
             container.addView(testLayout)
         }
         else{
-            btnAdd.visibility = View.GONE
             val testLayout = createLayout(test)
 
             val textView = createTextField(test.name)
@@ -207,9 +210,9 @@ class InfoCourse : AppCompatActivity() {
             setPadding(32, 16, 32, 16)
         }
         layout.setOnClickListener{
-//            val intent = Intent(this, InfoActivity::class.java)
-//            intent.putExtra("Id", id)
-//            startActivity(intent)
+            val intent = Intent(this, InfoTestActivity::class.java)
+            intent.putExtra("Test", test)
+            startActivity(intent)
         }
         return layout
     }
