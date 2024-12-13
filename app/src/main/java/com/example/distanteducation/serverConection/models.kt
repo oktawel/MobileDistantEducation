@@ -101,3 +101,12 @@ data class CourseRequestUpdate(
     val description: String,
     val lecturerId: Long
 )
+
+data class Test (
+    val id: Long,
+    val name: String,
+    val description: String,
+    val open: Boolean,
+    val mark: Float,
+    val subjectId: Long
+)

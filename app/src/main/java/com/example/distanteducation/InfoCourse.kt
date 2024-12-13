@@ -2,6 +2,8 @@ package com.example.distanteducation
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -22,21 +24,27 @@ import com.example.distanteducation.serverConection.Group
 import com.example.distanteducation.serverConection.Lecturer
 import com.example.distanteducation.serverConection.RetrofitClient
 import com.example.distanteducation.serverConection.Student
+import com.example.distanteducation.serverConection.Test
 import com.example.distanteducation.serverConection.UserSession
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ListCourses : AppCompatActivity() {
+class InfoCourse : AppCompatActivity() {
     private lateinit var btnAdd: Button
+    private lateinit var tTittle: TextView
+    private lateinit var tDescription: TextView
     private lateinit var container: LinearLayout
+
+
     private lateinit var token: String
+    private lateinit var infoCourse: Course
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_list_courses)
+        setContentView(R.layout.activity_info_course)
 
         btnAdd = findViewById(R.id.btnAdd)
 
@@ -49,6 +57,27 @@ class ListCourses : AppCompatActivity() {
         val btnLogout: ImageView = findViewById(R.id.btn_exit_acc)
         btnLogout.setOnClickListener {
             LogoutHelper.performLogout(this)
+        }
+        val btnBack: ImageButton = findViewById(R.id.btn_back)
+        btnBack.setOnClickListener {
+            finish()
+        }
+
+        val course = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra("Course", Course::class.java)
+        } else {
+            intent.getParcelableExtra("Course")
+        }
+        infoCourse = course!!
+
+        tTittle = findViewById(R.id.title)
+        tDescription = findViewById(R.id.containerDescription)
+
+        tTittle.text = course.name
+        tDescription.text = course.description
+        btnAdd.text = "Добавить тест"
+        btnAdd.setOnClickListener {
+            startAdd()
         }
 
         loadData()
@@ -63,7 +92,7 @@ class ListCourses : AppCompatActivity() {
 
     private fun loadData() {
         container = findViewById<LinearLayout>(R.id.containerList)
-        loadCourses()
+        loadTests()
     }
 
     private fun startAdd(){
@@ -83,37 +112,41 @@ class ListCourses : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun loadCourses() {
-        btnAdd.text = "Добавить курс"
-        btnAdd.setOnClickListener {
-            startAdd()
-        }
-
+    private fun loadTests() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val response = RetrofitClient.apiService.getAllCourses("Bearer $token")
+                val response = RetrofitClient.apiService.getAllTestsByCourse(
+                    token = "Bearer $token",
+                    courseId = infoCourse.id,
+                    studentId = ((if (UserSession.user!!.role == "Lector") {
+                        0
+                    } else {
+                        UserSession.user!!.id
+                    })!!)
+                )
                 if (response.isSuccessful) {
-                    val courses = response.body() ?: emptyList()
+                    val tests = response.body() ?: emptyList()
 
                     withContext(Dispatchers.Main) {
                         container.removeAllViews()
-                        for (course in courses) {
-                            addListCourseView(course)
+                        for (test in tests) {
+                            addListTestView(test)
                         }
                     }
                 } else {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(
-                            this@ListCourses,
+                            this@InfoCourse,
                             "Ошибка загрузки данных: ${response.code()}",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
+                    loadData()
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
-                        this@ListCourses,
+                        this@InfoCourse,
                         "Ошибка соединения: ${e.message}",
                         Toast.LENGTH_SHORT
                     ).show()
@@ -125,53 +158,43 @@ class ListCourses : AppCompatActivity() {
 
 
 
-    private fun addListCourseView(course: Course) {
+    private fun addListTestView(test: Test) {
         if (UserSession.user!!.role == "Lector"){
             btnAdd.visibility = View.VISIBLE
 
-            val courseLayout = createLayout(course)
+            val testLayout = createLayout(test)
 
-            val courseLayoutText = createLayoutText()
-            val textView = createTextField(course.name)
-            val textLecturer = createLecturerField(course.lecturerName, course.lecturerSurname)
+            val textView = createTextField(test.name)
 
-            courseLayoutText.addView(textView)
-            courseLayoutText.addView(textLecturer)
+            testLayout.addView(textView)
 
-            courseLayout.addView(courseLayoutText)
+            val editButton = createBtnEdit(test)
+            val deleteButton = createBtnDelete(test.id)
 
-            val courseLayoutButton = createLayoutButtons()
-            val groupButton = createBtnGroups(course)
-            val editButton = createBtnEdit(course)
-            val deleteButton = createBtnDelete(course.id)
 
-            courseLayoutButton.addView(groupButton)
-            courseLayoutButton.addView(editButton)
-            courseLayoutButton.addView(deleteButton)
+            testLayout.addView(editButton)
+            testLayout.addView(deleteButton)
 
-            courseLayout.addView(courseLayoutButton)
-
-            container.addView(courseLayout)
+            container.addView(testLayout)
         }
-        else if (course.groups.any { it.name == UserSession.studentGroup }){
+        else{
             btnAdd.visibility = View.GONE
-            val courseLayout = createLayout(course)
+            val testLayout = createLayout(test)
 
-            val courseLayoutText = createLayoutText()
-            val textView = createTextField(course.name)
-            val textLecturer = createLecturerField(course.lecturerName, course.lecturerSurname)
+            val textView = createTextField(test.name)
 
-            courseLayoutText.addView(textView)
-            courseLayoutText.addView(textLecturer)
+            testLayout.addView(textView)
 
-            courseLayout.addView(courseLayoutText)
+            val textViewMark = createMarkField(test.mark!!)
 
-            container.addView(courseLayout)
+            testLayout.addView(textViewMark)
+
+            container.addView(testLayout)
         }
     }
 
 
-    private fun createLayout(course: Course): LinearLayout {
+    private fun createLayout(test: Test): LinearLayout {
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             background = resources.getDrawable(R.drawable.rounded_border_courses, theme)
@@ -184,35 +207,9 @@ class ListCourses : AppCompatActivity() {
             setPadding(32, 16, 32, 16)
         }
         layout.setOnClickListener{
-            val intent = Intent(this, InfoCourse::class.java)
-            intent.putExtra("Course", course)
-            startActivity(intent)
-        }
-        return layout
-    }
-
-    private fun createLayoutText(): LinearLayout {
-        val layout = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                1f
-            ).apply { setMargins(0, 15, 0, 15) }
-            gravity = Gravity.CENTER_VERTICAL
-        }
-        return layout
-    }
-
-    private fun createLayoutButtons(): LinearLayout {
-        val layout = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-            )
-            gravity = Gravity.CENTER_VERTICAL
-            setPadding(0, 10, 0, 0)
+//            val intent = Intent(this, InfoActivity::class.java)
+//            intent.putExtra("Id", id)
+//            startActivity(intent)
         }
         return layout
     }
@@ -222,47 +219,33 @@ class ListCourses : AppCompatActivity() {
             text = "${name}"
             textSize = 25f
             setTextColor(ContextCompat.getColor(context, android.R.color.black))
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply { setMargins(0, 15, 0, 8) }
         }
         return textView
     }
 
-    private fun createLecturerField(name:String, surname:String): TextView {
+    private fun createMarkField(mark: Float): TextView {
         val textView = TextView(this).apply {
-            text = "Лектор: ${surname} ${name} "
-            textSize = 15f
-            setTextColor(ContextCompat.getColor(context, android.R.color.black))
+            val resultMark = "%.2f".format(mark)
+            if (mark == 0.toFloat()){
+                text = "Ещё не пройден"
+                setTextColor(ContextCompat.getColor(context, R.color.red))
+            }
+            else{
+                text = "Оценка: ${resultMark}"
+                setTextColor(ContextCompat.getColor(context, R.color.green))
+            }
+            textSize = 20f
+            gravity = Gravity.END
+
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply { setMargins(0, 15, 0, 8) }
         }
         return textView
     }
 
-    private fun createBtnGroups(course: Course): CardView {
+    private fun createBtnEdit(test: Test): CardView {
         val editButton = CardView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(130, 130).apply {
-                setMargins(16, 16, 16, 16)
-            }
-            radius = 75f
-            cardElevation = 10f
-            setCardBackgroundColor(ContextCompat.getColor(context, R.color.field_text))
-            addView(ImageView(context).apply {
-                setImageResource(R.drawable.baseline_groups_24)
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT
-                )
-                scaleType = ImageView.ScaleType.CENTER_INSIDE
-                setColorFilter(ContextCompat.getColor(context, R.color.button))
-            })
-
-            setOnClickListener {
-                startUpdateGroups(course)
-            }
-        }
-        return editButton
-    }
-
-    private fun createBtnEdit(course: Course): CardView {
-        val editButton = CardView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(130, 130).apply {
+            layoutParams = LinearLayout.LayoutParams(100, 100).apply {
                 setMargins(16, 16, 16, 16)
             }
             radius = 75f
@@ -279,7 +262,7 @@ class ListCourses : AppCompatActivity() {
             })
 
             setOnClickListener {
-                startEdit(course)
+                //startEdit(course)
             }
         }
         return editButton
@@ -287,7 +270,7 @@ class ListCourses : AppCompatActivity() {
 
     private fun createBtnDelete(id:Long): CardView {
         val deleteButton = CardView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(130, 130).apply {
+            layoutParams = LinearLayout.LayoutParams(100, 100).apply {
                 setMargins(16, 16, 16, 16)
             }
             radius = 75f
@@ -303,7 +286,7 @@ class ListCourses : AppCompatActivity() {
                 setColorFilter(ContextCompat.getColor(context, R.color.button))
             })
             setOnClickListener {
-                deleteCourse(id)
+                //deleteCourse(id)
             }
         }
         return deleteButton
@@ -327,14 +310,14 @@ class ListCourses : AppCompatActivity() {
                         withContext(Dispatchers.Main) {
                             if (response.isSuccessful) {
                                 Toast.makeText(
-                                    this@ListCourses,
+                                    this@InfoCourse,
                                     "Курс успешно удалён",
                                     Toast.LENGTH_SHORT
                                 ).show()
-                                loadCourses()
+                                loadTests()
                             } else {
                                 Toast.makeText(
-                                    this@ListCourses,
+                                    this@InfoCourse,
                                     "Ошибка удаления курса",
                                     Toast.LENGTH_SHORT
                                 ).show()
@@ -343,7 +326,7 @@ class ListCourses : AppCompatActivity() {
                     } catch (e: Exception) {
                         withContext(Dispatchers.Main) {
                             Toast.makeText(
-                                this@ListCourses,
+                                this@InfoCourse,
                                 "Ошибка: ${e.message}",
                                 Toast.LENGTH_SHORT
                             ).show()

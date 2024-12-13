@@ -24,6 +24,7 @@
         <activity android:name=".CourseGroups" />
         <activity android:name=".AddCourse" />
         <activity android:name=".EditCourseActivity" />
+        <activity android:name=".InfoCourse" />
 
         <activity android:name=".WelcomeActivity"
             android:exported="true">

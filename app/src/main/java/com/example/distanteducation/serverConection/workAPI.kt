@@ -138,6 +138,15 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Body courseRequest: CourseRequestUpdate
     ): Response<Unit>
+
+
+    @GET("backend-1.0-SNAPSHOT/testsByCourse/{courseId}")
+    suspend fun getAllTestsByCourse(
+        @Header("Authorization") token: String,
+        @Path("courseId") courseId: Long,
+        @Query("studentId") studentId: Long
+    ): Response<List<Test>>
+
 }
 
 
