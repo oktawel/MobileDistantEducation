@@ -33,31 +33,28 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         if (oldVersion < 2) {
-            val addColumnsQuery1 = """
-                ALTER TABLE $TABLE_USERS 
-                ADD COLUMN $COLUMN_FIRST_NAME TEXT NOT NULL DEFAULT ''
-
-            """.trimIndent()
-            val addColumnsQuery2 = """
-
-                ALTER TABLE $TABLE_USERS 
-                ADD COLUMN $COLUMN_LAST_NAME TEXT NOT NULL DEFAULT '';
-            """.trimIndent()
-            db.execSQL(addColumnsQuery1)
-            db.execSQL(addColumnsQuery2)
+            db.execSQL("ALTER TABLE $TABLE_USERS ADD COLUMN $COLUMN_FIRST_NAME TEXT NOT NULL DEFAULT ''")
+            db.execSQL("ALTER TABLE $TABLE_USERS ADD COLUMN $COLUMN_LAST_NAME TEXT NOT NULL DEFAULT ''")
         }
     }
+
 
     fun insertUser(username: String, password: String, firstName: String, lastName: String): Long {
         val db = writableDatabase
-        val values = ContentValues().apply {
-            put(COLUMN_USERNAME, username)
-            put(COLUMN_PASSWORD, password)
-            put(COLUMN_FIRST_NAME, firstName)
-            put(COLUMN_LAST_NAME, lastName)
+        return try {
+            val values = ContentValues().apply {
+                put(COLUMN_USERNAME, username)
+                put(COLUMN_PASSWORD, password)
+                put(COLUMN_FIRST_NAME, firstName)
+                put(COLUMN_LAST_NAME, lastName)
+            }
+            db.insert(TABLE_USERS, null, values)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            -1 // Возвращаем -1 в случае ошибки
         }
-        return db.insert(TABLE_USERS, null, values)
     }
+
 
     fun getAllUsers(): List<Map<String, String>> {
         val db = readableDatabase
@@ -86,26 +83,27 @@ class UserDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
 
     fun getByUsername(username: String): Map<String, String>? {
         val db = readableDatabase
-        val cursor = db.query(
-            TABLE_USERS, // Таблица
-            arrayOf(COLUMN_ID, COLUMN_PASSWORD, COLUMN_FIRST_NAME, COLUMN_LAST_NAME), // Столбцы для выборки
-            "$COLUMN_USERNAME = ?", // Условие WHERE
-            arrayOf(username), // Значение для условия
-            null, // Группировка
-            null, // Условие HAVING
-            null // Сортировка
-        )
-
-        var user: Map<String, String>? = null
-        if (cursor.moveToFirst()) {
-            user = mapOf(
-                COLUMN_ID to cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)).toString(),
-                COLUMN_PASSWORD to cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PASSWORD)),
-                COLUMN_FIRST_NAME to cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIRST_NAME)),
-                COLUMN_LAST_NAME to cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LAST_NAME))
+        return db.use {
+            val cursor = it.query(
+                TABLE_USERS,
+                arrayOf(COLUMN_ID, COLUMN_PASSWORD, COLUMN_FIRST_NAME, COLUMN_LAST_NAME),
+                "$COLUMN_USERNAME = ?",
+                arrayOf(username),
+                null, null, null
             )
+
+            cursor.use {
+                if (cursor.moveToFirst()) {
+                    return mapOf(
+                        COLUMN_ID to cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID)).toString(),
+                        COLUMN_PASSWORD to cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PASSWORD)),
+                        COLUMN_FIRST_NAME to cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_FIRST_NAME)),
+                        COLUMN_LAST_NAME to cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LAST_NAME))
+                    )
+                }
+                return null
+            }
         }
-        cursor.close()
-        return user
     }
+
 }

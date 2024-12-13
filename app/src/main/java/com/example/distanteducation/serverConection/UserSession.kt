@@ -5,6 +5,7 @@ import com.example.distanteducation.serverConection.UserResponse
 object UserSession {
     var token: String? = null
     var user: UserResponse? = null
+    var LecturerId: Long? = null
     var studentGroup: String? = null
 
     // Проверка, вошел ли пользователь
@@ -16,6 +17,7 @@ object UserSession {
         token = null
         user = null
         studentGroup = null
+        LecturerId = null
     }
 }
 

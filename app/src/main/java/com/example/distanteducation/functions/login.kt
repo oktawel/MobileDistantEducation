@@ -66,13 +66,17 @@ object LoginHelper {
 
                         val intent = Intent(activity, AdminActivity::class.java)
                         activity.startActivity(intent)
+                        activity.finish()
                     }
                     "Lector" -> {
                         saveInDatabase(activity, login, password, user.name!!, user.surname!!)
                         UserSession.user = user
 
+                        UserSession.LecturerId = user.id
+
                         val intent = Intent(activity, ListCourses::class.java)
                         activity.startActivity(intent)
+                        activity.finish()
                     }
                     "Student" -> {
                         saveInDatabase(activity, login, password, user.name!!, user.surname!!)
@@ -87,6 +91,7 @@ object LoginHelper {
 
                         val intent = Intent(activity, ListCourses::class.java)
                         activity.startActivity(intent)
+                        activity.finish()
                     }
                     else -> {
                         // Это выполняется, если ни один из вариантов не подходит
@@ -104,9 +109,10 @@ object LoginHelper {
 
     private fun saveInDatabase(activity: Activity, login: String, password: String, name: String, surname: String) {
         val dbHelper = UserDatabaseHelper(activity)
-
-        if (dbHelper.getByUsername(login) == null) {
-            dbHelper.insertUser(login, password, name, surname)
+        dbHelper.use {
+            if (it.getByUsername(login) == null) {
+                it.insertUser(login, password, name, surname)
+            }
         }
     }
 }

@@ -21,6 +21,10 @@
         <activity android:name=".EditActivity" />
 
         <activity android:name=".ListCourses" />
+        <activity android:name=".CourseGroups" />
+        <activity android:name=".AddCourse" />
+        <activity android:name=".EditCourseActivity" />
+
         <activity android:name=".WelcomeActivity"
             android:exported="true">
             <intent-filter>

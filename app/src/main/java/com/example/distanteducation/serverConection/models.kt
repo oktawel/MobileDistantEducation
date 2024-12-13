@@ -1,5 +1,8 @@
 package com.example.distanteducation.serverConection
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 data class LoginRequest(val username: String, val password: String)
 
 data class TokenResponse(val token: String)
@@ -30,11 +33,11 @@ data class Student(
     val userLogin: String,
     val userPassword: String
 )
-
+@Parcelize
 data class Group(
     val id: Long,
     val name: String,
-)
+) : Parcelable
 
 data class GroupWithCourses(
     val id: Long,
@@ -77,7 +80,7 @@ data class GroupRequestUpdate(
     val name: String
 )
 
-
+@Parcelize
 data class Course(
     val id: Long,
     val name: String,
@@ -85,4 +88,16 @@ data class Course(
     val lecturerName: String,
     val lecturerSurname: String,
     val groups: List<Group>
+) : Parcelable
+
+data class CourseRequest(
+    val name: String,
+    val description: String,
+    val lecturerId: Long
+)
+data class CourseRequestUpdate(
+    val id: Long,
+    val name: String,
+    val description: String,
+    val lecturerId: Long
 )

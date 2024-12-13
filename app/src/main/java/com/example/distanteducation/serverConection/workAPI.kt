@@ -106,4 +106,39 @@ interface ApiService {
 
     @GET("backend-1.0-SNAPSHOT/courses")
     suspend fun getAllCourses(@Header("Authorization") token: String): Response<List<Course>>
+
+    @GET("backend-1.0-SNAPSHOT/course/{courseId}/removeConnect/{groupId}")
+    suspend fun removeGroup(
+        @Header("Authorization") token: String,
+        @Path("courseId") courseId: Long,
+        @Path("groupId") groupId: Long
+    ): Response<Unit>
+
+    @GET("backend-1.0-SNAPSHOT/course/{courseId}/connectGroup/{groupId}")
+    suspend fun connectGroup(
+        @Header("Authorization") token: String,
+        @Path("courseId") courseId: Long,
+        @Path("groupId") groupId: Long
+    ): Response<Unit>
+
+    @POST("backend-1.0-SNAPSHOT/course/add")
+    suspend fun addCourse(
+        @Header("Authorization") token: String,
+        @Body courseRequest: CourseRequest
+    ): Response<Void>
+
+    @DELETE("backend-1.0-SNAPSHOT/course/delete/{id}")
+    suspend fun deleteCourse(
+        @Header("Authorization") token: String,
+        @Path("id") courseId: Long
+    ): Response<Unit>
+
+    @POST("backend-1.0-SNAPSHOT/course/update")
+    suspend fun updateCourse(
+        @Header("Authorization") token: String,
+        @Body courseRequest: CourseRequestUpdate
+    ): Response<Unit>
 }
+
+
+

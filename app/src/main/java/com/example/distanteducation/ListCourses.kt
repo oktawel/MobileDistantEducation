@@ -4,6 +4,8 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
+import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -13,6 +15,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.transition.Visibility
 import com.example.distanteducation.functions.LogoutHelper
 import com.example.distanteducation.serverConection.Course
 import com.example.distanteducation.serverConection.Group
@@ -64,13 +67,19 @@ class ListCourses : AppCompatActivity() {
     }
 
     private fun startAdd(){
-        val intent = Intent(this, AddActivity::class.java)
+        val intent = Intent(this, AddCourse::class.java)
         startActivity(intent)
     }
 
-    private fun startEdit(id: Long){
-        val intent = Intent(this, EditActivity::class.java)
-        intent.putExtra("Id", id)
+    private fun startEdit(course: Course){
+        val intent = Intent(this, EditCourseActivity::class.java)
+        intent.putExtra("Course", course)
+        startActivity(intent)
+    }
+
+    private fun startUpdateGroups(course: Course){
+        val intent = Intent(this, CourseGroups::class.java)
+        intent.putExtra("Course", course)
         startActivity(intent)
     }
 
@@ -118,34 +127,51 @@ class ListCourses : AppCompatActivity() {
 
     private fun addListCourseView(course: Course) {
         if (UserSession.user!!.role == "Lector"){
-            val courseLayout = createLayout(course.id)
+            btnAdd.visibility = View.VISIBLE
 
+            val courseLayout = createLayout(course)
+
+            val courseLayoutText = createLayoutText()
             val textView = createTextField(course.name)
-            courseLayout.addView(textView)
+            val textLecturer = createLecturerField(course.lecturerName, course.lecturerSurname)
 
-            val groupButton = createBtnGroups(course.id)
-            val editButton = createBtnEdit(course.id)
+            courseLayoutText.addView(textView)
+            courseLayoutText.addView(textLecturer)
+
+            courseLayout.addView(courseLayoutText)
+
+            val courseLayoutButton = createLayoutButtons()
+            val groupButton = createBtnGroups(course)
+            val editButton = createBtnEdit(course)
             val deleteButton = createBtnDelete(course.id)
 
-            courseLayout.addView(groupButton)
-            courseLayout.addView(editButton)
-            courseLayout.addView(deleteButton)
+            courseLayoutButton.addView(groupButton)
+            courseLayoutButton.addView(editButton)
+            courseLayoutButton.addView(deleteButton)
+
+            courseLayout.addView(courseLayoutButton)
 
             container.addView(courseLayout)
         }
         else if (course.groups.any { it.name == UserSession.studentGroup }){
+            btnAdd.visibility = View.GONE
+            val courseLayout = createLayout(course)
 
-            val courseLayout = createLayout(course.id)
-
+            val courseLayoutText = createLayoutText()
             val textView = createTextField(course.name)
-            courseLayout.addView(textView)
+            val textLecturer = createLecturerField(course.lecturerName, course.lecturerSurname)
+
+            courseLayoutText.addView(textView)
+            courseLayoutText.addView(textLecturer)
+
+            courseLayout.addView(courseLayoutText)
 
             container.addView(courseLayout)
         }
     }
 
 
-    private fun createLayout(id:Long): LinearLayout {
+    private fun createLayout(course: Course): LinearLayout {
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             background = resources.getDrawable(R.drawable.rounded_border_courses, theme)
@@ -165,19 +191,53 @@ class ListCourses : AppCompatActivity() {
         return layout
     }
 
+    private fun createLayoutText(): LinearLayout {
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                1f
+            ).apply { setMargins(0, 15, 0, 15) }
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        return layout
+    }
+
+    private fun createLayoutButtons(): LinearLayout {
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+            )
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(0, 10, 0, 0)
+        }
+        return layout
+    }
+
     private fun createTextField(name:String): TextView {
         val textView = TextView(this).apply {
             text = "${name}"
             textSize = 25f
             setTextColor(ContextCompat.getColor(context, android.R.color.black))
-            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 2f).apply { setMargins(0, 15, 0, 8) }
         }
         return textView
     }
 
-    private fun createBtnGroups(id:Long): CardView {
+    private fun createLecturerField(name:String, surname:String): TextView {
+        val textView = TextView(this).apply {
+            text = "Лектор: ${surname} ${name} "
+            textSize = 15f
+            setTextColor(ContextCompat.getColor(context, android.R.color.black))
+        }
+        return textView
+    }
+
+    private fun createBtnGroups(course: Course): CardView {
         val editButton = CardView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(100, 100).apply {
+            layoutParams = LinearLayout.LayoutParams(130, 130).apply {
                 setMargins(16, 16, 16, 16)
             }
             radius = 75f
@@ -194,15 +254,15 @@ class ListCourses : AppCompatActivity() {
             })
 
             setOnClickListener {
-//                startEdit(id)
+                startUpdateGroups(course)
             }
         }
         return editButton
     }
 
-    private fun createBtnEdit(id:Long): CardView {
+    private fun createBtnEdit(course: Course): CardView {
         val editButton = CardView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(100, 100).apply {
+            layoutParams = LinearLayout.LayoutParams(130, 130).apply {
                 setMargins(16, 16, 16, 16)
             }
             radius = 75f
@@ -219,7 +279,7 @@ class ListCourses : AppCompatActivity() {
             })
 
             setOnClickListener {
-                startEdit(id)
+                startEdit(course)
             }
         }
         return editButton
@@ -227,7 +287,7 @@ class ListCourses : AppCompatActivity() {
 
     private fun createBtnDelete(id:Long): CardView {
         val deleteButton = CardView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(100, 100).apply {
+            layoutParams = LinearLayout.LayoutParams(130, 130).apply {
                 setMargins(16, 16, 16, 16)
             }
             radius = 75f
@@ -243,7 +303,7 @@ class ListCourses : AppCompatActivity() {
                 setColorFilter(ContextCompat.getColor(context, R.color.button))
             })
             setOnClickListener {
-                //deleteCourse(id)
+                deleteCourse(id)
             }
         }
         return deleteButton
@@ -260,22 +320,22 @@ class ListCourses : AppCompatActivity() {
 
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
-                        val response = apiService.deleteLecturer(
+                        val response = apiService.deleteCourse(
                             token = "Bearer ${UserSession.token}",
-                            lecturerId = courseId
+                            courseId = courseId
                         )
                         withContext(Dispatchers.Main) {
                             if (response.isSuccessful) {
                                 Toast.makeText(
                                     this@ListCourses,
-                                    "Лектор успешно удалён",
+                                    "Курс успешно удалён",
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 loadCourses()
                             } else {
                                 Toast.makeText(
                                     this@ListCourses,
-                                    "Ошибка удаления лектора",
+                                    "Ошибка удаления курса",
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
