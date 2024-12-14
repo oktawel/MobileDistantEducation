@@ -1,10 +1,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/student_info_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
+
     android:background="@color/white">
 
     <RelativeLayout
@@ -44,9 +44,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="6dp"
-            android:layout_marginBottom="14dp"
+            android:layout_marginBottom="20dp"
             android:layout_toStartOf="@+id/iv_profile_icon"
-            android:textSize="25sp"
+            android:textSize="20sp"
+            android:maxEms="10"
             android:textColor="@color/black"
             android:text="User_name"/>
 
@@ -90,88 +91,79 @@
         android:layout_height="447dp"
         android:layout_weight="1"
         android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginHorizontal="20dp">
 
         <TextView
-            android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="Создание теста"
+            android:textSize="34sp"
+            android:textStyle="bold"
             android:fontFamily="@font/playfair_display"
             android:gravity="center_horizontal"
-            android:text="InfoAbout"
-            android:textColor="@color/black"
-            android:textSize="34sp" />
+            android:layout_marginBottom="14dp" />
 
-        <TextView
-            android:id="@+id/containerName"
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_field"
-            android:orientation="vertical"
-            android:text="Name"
-            android:gravity="center_horizontal"
-            android:textSize="20dp"
-            android:layout_marginHorizontal="70dp"
-            android:padding="8dp"
-            android:layout_marginVertical="30dp"/>
+            android:hint="Название теста"
+            app:boxStrokeWidthFocused="3dp"
+            app:hintTextColor="@color/black"
+            app:helperTextTextColor="@color/redDelete"
+            android:layout_marginBottom="40dp"
+            app:boxBackgroundColor="@color/inputField"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp">
 
-        <TextView
-            android:id="@+id/containerSurname"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:textSize="20sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_field"
-            android:orientation="vertical"
-            android:text="Surname"
-            android:gravity="center_horizontal"
-            android:textSize="20dp"
-            android:layout_marginHorizontal="70dp"
-            android:padding="8dp"
-            android:layout_marginVertical="30dp"/>
+            android:hint="Описание теста"
+            app:boxStrokeWidthFocused="3dp"
+            app:hintTextColor="@color/black"
+            app:helperTextTextColor="@color/redDelete"
+            android:layout_marginBottom="40dp"
+            app:boxBackgroundColor="@color/inputField"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="30dp">
-
-            <TextView
-                android:id="@+id/containerLogin"
-                android:layout_width="150dp"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/inputDescription"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/rounded_field"
-                android:orientation="vertical"
-                android:text="Login"
-                android:gravity="center_horizontal"
-                android:textSize="20dp"
-                android:padding="8dp" />
+                android:inputType="textMultiLine"
+                android:gravity="top|start"
+                android:scrollbars="vertical"
+                android:overScrollMode="always"
+                android:maxLines="5"
+                android:minLines="3"
+                android:textSize="20sp" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
-                android:id="@+id/containerPassword"
-                android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/rounded_field"
-                android:orientation="vertical"
-                android:text="Password"
-                android:gravity="center_horizontal"
-                android:textSize="20dp"
-                android:padding="8dp" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="270dp"
-        android:gravity="center_horizontal">
 
         <Button
-            android:id="@+id/edit_button"
-            android:text="Редактировать"
-            android:drawableLeft="@drawable/baseline_edit_24"
-            android:drawableTint="@color/white"
-            android:drawablePadding="8dp"
+            android:id="@+id/btnAdd"
             android:layout_width="wrap_content"
             android:layout_height="70dp"
-            android:layout_gravity="center"
+            android:text="Создать тест"
             android:backgroundTint="@color/button"
             android:textColor="@color/white" />
-    </RelativeLayout>
+
+    </LinearLayout>
+
+
 </LinearLayout>

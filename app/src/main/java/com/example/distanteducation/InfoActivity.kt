@@ -1,5 +1,7 @@
 package com.example.distanteducation
 
+import android.content.Intent
+import android.os.Build
 import com.example.distanteducation.serverConection.Student
 
 import android.os.Bundle
@@ -23,6 +25,10 @@ class InfoActivity : AppCompatActivity() {
     private lateinit var tBDate: TextView
     private lateinit var tLogin: TextView
     private lateinit var tPassword: TextView
+    private lateinit var editButton: Button
+
+    private lateinit var type: String
+    private var Id: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,39 +40,52 @@ class InfoActivity : AppCompatActivity() {
             return
         }
 
-        val Id = intent.getLongExtra("Id", 0L)
-        val type = intent.getStringExtra("type")
+        type = intent.getStringExtra("type")!!
 
 
         when (type) {
             "lecturer" -> {
                 setContentView(R.layout.activity_info_lecturer)
-                tTittle = findViewById(R.id.title)
-                tName = findViewById(R.id.containerName)
+                initializeFields()
                 tSurname = findViewById(R.id.containerSurname)
                 tLogin = findViewById(R.id.containerLogin)
                 tPassword = findViewById(R.id.containerPassword)
-                loadLecturerDetails(Id)
+                val lecturer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra("Lecturer", Lecturer::class.java)
+                } else {
+                    intent.getParcelableExtra("Lecturer")
+                }
+                loadLecturerDetails(lecturer!!)
+                Id = lecturer.id
             }
             "student" -> {
                 setContentView(R.layout.activity_info_student)
-                tTittle = findViewById(R.id.title)
-                tName = findViewById(R.id.containerName)
+                initializeFields()
                 tSurname = findViewById(R.id.containerSurname)
                 tGroup = findViewById(R.id.containerGroup)
                 tBDate = findViewById(R.id.containerBDate)
                 tLogin = findViewById(R.id.containerLogin)
                 tPassword = findViewById(R.id.containerPassword)
-                loadStudentDetails(Id)
+                val student = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra("Student", Student::class.java)
+                } else {
+                    intent.getParcelableExtra("Student")
+                }
+                loadStudentDetails(student!!)
+                Id = student.id
             }
             "group" -> {
                 setContentView(R.layout.activity_info_group)
-                tTittle = findViewById(R.id.title)
-                tName = findViewById(R.id.containerName)
-                loadGroupDetails(Id)
+                initializeFields()
+                val group = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    intent.getParcelableExtra("Group", Group::class.java)
+                } else {
+                    intent.getParcelableExtra("Group")
+                }
+                loadGroupDetails(group!!)
+                Id = group.id
             }
         }
-        val editButton = findViewById<Button>(R.id.edit_button)
         val userName: TextView = findViewById(R.id.user_name)
 
         userName.text = UserSession.user!!.name
@@ -79,19 +98,96 @@ class InfoActivity : AppCompatActivity() {
         btnBack.setOnClickListener {
             finish()
         }
-
-
-        if (Id == 0L) {
-            Toast.makeText(this, "ID не найден!", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
-
     }
+
+    private fun initializeFields() {
+        editButton = findViewById(R.id.edit_button)
+        tTittle = findViewById(R.id.title)
+        tName = findViewById(R.id.containerName)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        when (type) {
+            "lecturer" -> loadLecturerDetails(Id)
+            "student" -> loadStudentDetails(Id)
+            "group" -> loadGroupDetails(Id)
+        }
+    }
+
+    private fun loadGroupDetails(group: Group) {
+        tTittle.text = "Информация о группе"
+        displayGrouprInfo(group)
+    }
+
+    private fun loadLecturerDetails(lecturer: Lecturer) {
+        tTittle.text = "Информация о лекторе"
+        displayLecturerInfo(lecturer)
+    }
+
+    private fun loadStudentDetails(student: Student) {
+        tTittle.text = "Информация о студенте"
+        displayStudentInfo(student)
+    }
+
+    private fun displayGrouprInfo(group: Group) {
+        tName.text = group.name
+
+        editButton.setOnClickListener{
+            startEditGroup(group)
+        }
+    }
+    private fun displayStudentInfo(student: Student) {
+        tName.text = student.name
+        tSurname.text = student.surname
+        tGroup.text = student.group
+        tBDate.text = student.birthDate
+        tLogin.text = student.userLogin
+        tPassword.text = student.userPassword
+
+        editButton.setOnClickListener{
+            startEditStudent(student)
+        }
+    }
+    private fun displayLecturerInfo(lecturer: Lecturer) {
+
+        tName.text = lecturer.name
+        tSurname.text = lecturer.surname
+        tLogin.text = lecturer.userLogin
+        tPassword.text = lecturer.userPassword
+
+        editButton.setOnClickListener{
+            startEditLecturer(lecturer)
+        }
+    }
+
+
+    private fun startEditLecturer(lecturer: Lecturer){
+        val intent = Intent(this, EditActivity::class.java)
+        intent.putExtra("type", type)
+        intent.putExtra("Lecturer", lecturer)
+        startActivity(intent)
+    }
+
+    private fun startEditGroup(group: Group){
+        val intent = Intent(this, EditActivity::class.java)
+        intent.putExtra("type", type)
+        intent.putExtra("Group", group)
+
+        startActivity(intent)
+    }
+
+    private fun startEditStudent(student: Student){
+        val intent = Intent(this, EditActivity::class.java)
+        intent.putExtra("type", type)
+        intent.putExtra("Student", student)
+        startActivity(intent)
+    }
+
+
 
     private fun loadGroupDetails(Id: Long) {
         val apiService = RetrofitClient.apiService
-        tTittle.text = "Информация о группе"
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = apiService.getGroupDetails(
@@ -162,24 +258,5 @@ class InfoActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    private fun displayGrouprInfo(group: Group) {
-        tName.text = group.name
-    }
-    private fun displayStudentInfo(student: Student) {
-        tName.text = student.name
-        tSurname.text = student.surname
-        tGroup.text = student.group
-        tBDate.text = student.birthDate
-        tLogin.text = student.userLogin
-        tPassword.text = student.userPassword
-    }
-    private fun displayLecturerInfo(lecturer: Lecturer) {
-
-        tName.text = lecturer.name
-        tSurname.text = lecturer.surname
-        tLogin.text = lecturer.userLogin
-        tPassword.text = lecturer.userPassword
     }
 }

@@ -224,7 +224,7 @@ class ListsActivity : AppCompatActivity() {
 
 
     private fun addListLecturersView(lecturer: Lecturer) {
-        val lecturerLayout = createLayout(lecturer.id)
+        val lecturerLayout = createLayoutLecturer(lecturer)
 
         val textView = createTextField(lecturer.id, lecturer.name, lecturer.surname)
         val editButton = createBtnEditLecturer(lecturer)
@@ -238,7 +238,7 @@ class ListsActivity : AppCompatActivity() {
     }
 
     private fun addListStudentsView(student: Student) {
-        val lecturerLayout = createLayout(student.id)
+        val lecturerLayout = createLayoutStudent(student)
 
         val textView = createTextField(student.id, student.name, student.surname)
         val editButton = createBtnEditStudent(student)
@@ -252,7 +252,7 @@ class ListsActivity : AppCompatActivity() {
     }
 
     private fun addListGroupsView(group: Group) {
-        val lecturerLayout = createLayout(group.id)
+        val lecturerLayout = createLayoutGroup(group)
 
         val textView = createTextField(group.id, group.name, "")
         val editButton = createBtnEditGroup(group)
@@ -267,7 +267,7 @@ class ListsActivity : AppCompatActivity() {
 
 
 
-    private fun createLayout(id:Long): LinearLayout {
+    private fun createLayoutStudent(student: Student): LinearLayout {
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             layoutParams = LinearLayout.LayoutParams(
@@ -280,8 +280,48 @@ class ListsActivity : AppCompatActivity() {
         }
         layout.setOnClickListener{
             val intent = Intent(this, InfoActivity::class.java)
-            intent.putExtra("Id", id)
             intent.putExtra("type", type)
+            intent.putExtra("Student", student)
+            startActivity(intent)
+        }
+        return layout
+    }
+
+    private fun createLayoutLecturer(lecturer: Lecturer): LinearLayout {
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(8, 8, 0, 8)
+            }
+            setPadding(16, 16, 16, 16)
+        }
+        layout.setOnClickListener{
+            val intent = Intent(this, InfoActivity::class.java)
+            intent.putExtra("type", type)
+            intent.putExtra("Lecturer", lecturer)
+            startActivity(intent)
+        }
+        return layout
+    }
+
+    private fun createLayoutGroup(group: Group): LinearLayout {
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(8, 8, 0, 8)
+            }
+            setPadding(16, 16, 16, 16)
+        }
+        layout.setOnClickListener{
+            val intent = Intent(this, InfoActivity::class.java)
+            intent.putExtra("type", type)
+            intent.putExtra("Group", group)
             startActivity(intent)
         }
         return layout
