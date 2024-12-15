@@ -22,6 +22,7 @@ import com.example.distanteducation.functions.LogoutHelper
 import com.example.distanteducation.serverConection.Course
 import com.example.distanteducation.serverConection.Group
 import com.example.distanteducation.serverConection.Lecturer
+import com.example.distanteducation.serverConection.MarkStudent
 import com.example.distanteducation.serverConection.RetrofitClient
 import com.example.distanteducation.serverConection.Student
 import com.example.distanteducation.serverConection.Test
@@ -36,6 +37,7 @@ class InfoTestActivity : AppCompatActivity() {
     private lateinit var tTittle: TextView
     private lateinit var tDescription: TextView
     private lateinit var tMark: TextView
+    private lateinit var container: LinearLayout
 
     private lateinit var token: String
     private lateinit var infoTest: Test
@@ -72,12 +74,129 @@ class InfoTestActivity : AppCompatActivity() {
         tTittle = findViewById(R.id.title)
         tDescription = findViewById(R.id.containerDescription)
         tMark = findViewById(R.id.containerMark)
+        container = findViewById(R.id.containerList)
+    }
 
+    override fun onResume() {
+        super.onResume()
+        loadData()
+    }
+
+    private fun loadMarks() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitClient.apiService.getAllMarksStudents(
+                    token = "Bearer $token",
+                    testId = infoTest.id,
+                )
+                if (response.isSuccessful) {
+                    val marks = response.body() ?: emptyList()
+
+                    withContext(Dispatchers.Main) {
+                        container.removeAllViews()
+                        for (mark in marks) {
+                            addListResultsView(mark)
+                        }
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            this@InfoTestActivity,
+                            "Ошибка загрузки данных: ${response.code()}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    loadData()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@InfoTestActivity,
+                        "Ошибка соединения: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+
+    private fun addListResultsView(markStudent: MarkStudent) {
+        if (UserSession.user!!.role == "Lector"){
+            val markLayout = createLayout()
+            val textView = createTextField(markStudent)
+            markLayout.addView(textView)
+            container.addView(markLayout)
+        }
+    }
+
+    private fun createLayout(): LinearLayout {
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            background = resources.getDrawable(R.drawable.rounded_border_courses, theme)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(8, 8, 0, 30)
+            }
+            setPadding(32, 16, 32, 16)
+        }
+        return layout
+    }
+
+    private fun createTextField(markStudent: MarkStudent): TextView {
+        val resultMark = "%.2f".format(markStudent.mark)
+        val textView = TextView(this).apply {
+            text = "${markStudent.group} ${markStudent.surname} ${markStudent.name} Оценка: ${resultMark} "
+            textSize = 15f
+            setTextColor(ContextCompat.getColor(context, android.R.color.black))
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply { setMargins(0, 15, 0, 8) }
+        }
+        return textView
+    }
+
+
+    private fun loadData(){
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitClient.apiService.getTestById(
+                    token = UserSession.token!!,
+                    testId = infoTest.id,
+                    studentId = UserSession.user!!.id!!
+                )
+                if (response.isSuccessful) {
+                    val test = response.body()
+                    withContext(Dispatchers.Main) {
+                        infoTest = test!!
+                        loadTestData()
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            this@InfoTestActivity,
+                            "Ошибка загрузки данных: ${response.code()}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@InfoTestActivity,
+                        "Ошибка соединения: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+
+    private fun loadTestData(){
         tTittle.text = infoTest.name
         tDescription.text = infoTest.description
 
-        val resultMark = "%.2f".format(test.mark)
-        if (test.mark == 0.toFloat()){
+        val resultMark = "%.2f".format(infoTest.mark)
+        if (infoTest.mark == 0.toFloat()){
             tMark.text = "Оценка: Ещё не пройден"
             tMark.setTextColor(resources.getColor(R.color.red, theme))
         }
@@ -86,23 +205,22 @@ class InfoTestActivity : AppCompatActivity() {
             tMark.setTextColor(resources.getColor(R.color.green, theme))
         }
 
-        if (UserSession.user!!.role == "Lector" || test.mark != 0.toFloat() || !(test.open)){
+        if (UserSession.user!!.role == "Lector" || infoTest.mark != 0.toFloat() || !(infoTest.open)){
             if (UserSession.user!!.role == "Lector"){
                 tMark.visibility = View.GONE
+                loadMarks()
             }
             btnComplete.visibility = View.GONE
         }
 
         btnComplete.setOnClickListener {
-            startAdd()
+            startExecute(infoTest.id)
         }
-
-
-
     }
 
-    private fun startAdd(){
-        val intent = Intent(this, AddCourse::class.java)
+    private fun startExecute(id: Long){
+        val intent = Intent(this, ExecuteTest::class.java)
+        intent.putExtra("Id", id)
         startActivity(intent)
     }
 

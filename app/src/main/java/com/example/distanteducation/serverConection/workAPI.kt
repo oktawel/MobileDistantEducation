@@ -114,6 +114,13 @@ interface ApiService {
         @Path("groupId") groupId: Long
     ): Response<Unit>
 
+    @GET("backend-1.0-SNAPSHOT/test/{testId}")
+    suspend fun getTestById(
+        @Header("Authorization") token: String,
+        @Path("testId") testId: Long,
+        @Query("studentId") studentId: Long
+    ): Response<Test>
+
     @GET("backend-1.0-SNAPSHOT/course/{courseId}/connectGroup/{groupId}")
     suspend fun connectGroup(
         @Header("Authorization") token: String,
@@ -165,6 +172,24 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("id") testId: Long
     ): Response<Unit>
+
+    @POST("backend-1.0-SNAPSHOT/test/answer")
+    suspend fun answerTest(
+        @Header("Authorization") token: String,
+        @Body testRequestUpdate: TestAnswer
+    ): Response<Unit>
+
+    @GET("backend-1.0-SNAPSHOT/test/open/{testId}")
+    suspend fun openTest(
+        @Header("Authorization") token: String,
+        @Path("testId") testId: Long,
+    ): Response<TestExecute>
+
+    @GET("backend-1.0-SNAPSHOT/testsResults")
+    suspend fun getAllMarksStudents(
+        @Header("Authorization") token: String,
+        @Query("testId") testId: Long
+    ): Response<List<MarkStudent>>
 }
 
 

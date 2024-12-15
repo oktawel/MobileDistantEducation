@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/rounded_border"
+    android:layout_marginBottom="20dp">
+
+    <TextView
+        android:id="@+id/questionText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Верно или Неверно?"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:layout_marginBottom="8dp" />
+
+    <RadioGroup
+        android:id="@+id/radioGroupTrueFalse"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@drawable/rounded_field">
+
+        <RadioButton
+            android:id="@+id/radioTrue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Верно"
+            android:textSize="14sp"
+            android:layout_marginEnd="16dp" />
+
+        <RadioButton
+            android:id="@+id/radioFalse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Неверно"
+            android:textSize="14sp" />
+
+    </RadioGroup>
+
+</LinearLayout>

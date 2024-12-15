@@ -146,3 +146,51 @@ data class QuestionType(val id: Int, val name: String) {
         return name
     }
 }
+data class TestExecute(
+    val id: Long,
+    val name: String,
+    val description: String,
+    val open: Boolean,
+    val questions: List<QuestionExecute>,
+    val subjectId: Long
+)
+
+data class QuestionExecute(
+    val id: Long,
+    val text: String,
+    val testId: Long,
+    val typeQuestionID: Long,
+    val cost: Int,
+    val options: List<OptionExecute>?
+)
+
+data class OptionExecute(
+    val id: Long,
+    val questionId: Long,
+    val text: String,
+    val correct: Boolean
+)
+
+data class TestAnswer(
+    val testId: Long,
+    val studentId: Long,
+    val answerQuestions: List<QuestionAnswer>,
+)
+
+data class QuestionAnswer(
+    val questionId: Long,
+    val answerOptions: List<OptionAnswer>
+)
+
+data class OptionAnswer(
+    val optionId: Long?,
+    val textAnswer: String?,
+)
+
+data class MarkStudent(
+    val id: Long?,
+    val name: String?,
+    val surname: String?,
+    val group: String?,
+    val mark: Float,
+)

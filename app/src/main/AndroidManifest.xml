@@ -29,6 +29,7 @@
         <activity android:name=".InfoTestActivity" />
         <activity android:name=".AddTest" />
         <activity android:name=".EditTest" />
+        <activity android:name=".ExecuteTest" />
         <activity android:name=".AddQuestion" />
         <activity android:name=".AddOption" />
 
