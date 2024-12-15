@@ -95,26 +95,20 @@ class InfoCourse : AppCompatActivity() {
         loadData()
     }
 
-
     private fun loadData() {
         container = findViewById<LinearLayout>(R.id.containerList)
         loadTests()
     }
 
     private fun startAdd(){
-        val intent = Intent(this, AddCourse::class.java)
+        val intent = Intent(this, AddTest::class.java)
+        intent.putExtra("courseId", infoCourse.id)
         startActivity(intent)
     }
 
-    private fun startEdit(course: Course){
-        val intent = Intent(this, EditCourseActivity::class.java)
-        intent.putExtra("Course", course)
-        startActivity(intent)
-    }
-
-    private fun startUpdateGroups(course: Course){
-        val intent = Intent(this, CourseGroups::class.java)
-        intent.putExtra("Course", course)
+    private fun startEdit(test: Test){
+        val intent = Intent(this, EditTest::class.java)
+        intent.putExtra("Test", test)
         startActivity(intent)
     }
 
@@ -161,9 +155,6 @@ class InfoCourse : AppCompatActivity() {
         }
     }
 
-
-
-
     private fun addListTestView(test: Test) {
         if (UserSession.user!!.role == "Lector"){
             val testLayout = createLayout(test)
@@ -195,7 +186,6 @@ class InfoCourse : AppCompatActivity() {
             container.addView(testLayout)
         }
     }
-
 
     private fun createLayout(test: Test): LinearLayout {
         val layout = LinearLayout(this).apply {
@@ -265,7 +255,7 @@ class InfoCourse : AppCompatActivity() {
             })
 
             setOnClickListener {
-                //startEdit(course)
+                startEdit(test)
             }
         }
         return editButton
@@ -289,7 +279,7 @@ class InfoCourse : AppCompatActivity() {
                 setColorFilter(ContextCompat.getColor(context, R.color.button))
             })
             setOnClickListener {
-                //deleteCourse(id)
+                deleteCourse(id)
             }
         }
         return deleteButton
@@ -297,31 +287,31 @@ class InfoCourse : AppCompatActivity() {
 
 
 
-    private fun deleteCourse(courseId: Long) {
+    private fun deleteCourse(id: Long) {
         AlertDialog.Builder(this)
-            .setTitle("Удаление курса")
-            .setMessage("Вы уверены, что хотите удалить курс?")
+            .setTitle("Удаление теста")
+            .setMessage("Вы уверены, что хотите удалить тест?")
             .setPositiveButton("Да") { _, _ ->
                 val apiService = RetrofitClient.apiService
 
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
-                        val response = apiService.deleteCourse(
+                        val response = apiService.deleteTest(
                             token = "Bearer ${UserSession.token}",
-                            courseId = courseId
+                            testId = id
                         )
                         withContext(Dispatchers.Main) {
                             if (response.isSuccessful) {
                                 Toast.makeText(
                                     this@InfoCourse,
-                                    "Курс успешно удалён",
+                                    "Тест успешно удалён",
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 loadTests()
                             } else {
                                 Toast.makeText(
                                     this@InfoCourse,
-                                    "Ошибка удаления курса",
+                                    "Ошибка удаления теста",
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }

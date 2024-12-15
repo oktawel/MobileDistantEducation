@@ -97,7 +97,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Создание теста"
+            android:text="Добавление вопроса"
             android:textSize="34sp"
             android:textStyle="bold"
             android:fontFamily="@font/playfair_display"
@@ -108,7 +108,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Название теста"
+            android:hint="Текст вопроса"
             app:boxStrokeWidthFocused="3dp"
             app:hintTextColor="@color/black"
             app:helperTextTextColor="@color/redDelete"
@@ -127,13 +127,42 @@
                 android:textSize="20sp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/rounded_border">
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:text="Тип вопроса"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+
+            <Spinner
+                android:id="@+id/questionType"
+                android:layout_width="match_parent"
+                android:layout_height="30sp"
+                android:textSize="20sp"
+                android:background="@drawable/rounded_field_input"
+                android:spinnerMode= "dropdown"
+                android:dropDownWidth="match_parent"
+                android:popupBackground="@drawable/spinner_dropdown_border"
+                android:divider="@color/borderInput"
+                android:dividerHeight="1dp"/>
+        </LinearLayout>
+
+        <!-- Input for Points -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Описание теста"
+            android:hint="Количество баллов"
             app:boxStrokeWidthFocused="3dp"
             app:hintTextColor="@color/black"
-            app:helperTextTextColor="@color/redDelete"
             android:layout_marginBottom="20dp"
             app:boxBackgroundColor="@color/inputField"
             app:boxCornerRadiusBottomEnd="10dp"
@@ -142,40 +171,70 @@
             app:boxCornerRadiusTopStart="10dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/inputDescription"
+                android:id="@+id/inputPoints"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
-                android:gravity="top|start"
-                android:scrollbars="vertical"
-                android:overScrollMode="always"
-                android:maxLines="5"
-                android:minLines="3"
+                android:inputType="number"
                 android:textSize="20sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <TextView
+            android:id="@+id/textAnswers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="Ответы к вопросу"
+            android:textColor="@color/black"
+            android:gravity="center"/>
+
+        <LinearLayout
+            android:id="@+id/freeAnswerContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="20dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Введите правильный ответ"
+                app:boxStrokeWidthFocused="3dp"
+                app:boxBackgroundColor="@color/inputField">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/inputFreeAnswer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/rounded_border"
+                    android:inputType="text"
+                    android:textSize="20sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
         <ScrollView
+            android:id="@+id/optionsContainer"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:visibility="gone"
             android:background="@drawable/rounded_border">
 
             <LinearLayout
-                android:id="@+id/containerQuestions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="8dp" >
 
                 <LinearLayout
-                    android:id="@+id/containerList"
+                    android:id="@+id/optionsList"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="8dp" />
 
                 <ImageButton
-                    android:id="@+id/btnAdd"
+                    android:id="@+id/btnAddOption"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:background="@drawable/baseline_add_circle_outline_24"
@@ -183,16 +242,48 @@
                     android:layout_gravity="center"/>
 
             </LinearLayout>
-
         </ScrollView>
 
+        <LinearLayout
+            android:id="@+id/TFAnswerContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/rounded_border">
 
+            <RadioGroup
+                android:id="@+id/radioGroupTrueFalse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radioTrue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Верно"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="20dp" />
+
+                <RadioButton
+                    android:id="@+id/radioFalse"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Неверно"
+                    android:textSize="16sp" />
+
+            </RadioGroup>
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/btnCreate"
             android:layout_width="wrap_content"
             android:layout_height="70dp"
-            android:text="Создать тест"
+            android:text="Сохранить"
             android:textSize="24dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="40dp"

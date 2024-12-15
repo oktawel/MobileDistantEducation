@@ -147,6 +147,24 @@ interface ApiService {
         @Query("studentId") studentId: Long
     ): Response<List<Test>>
 
+
+    @POST("backend-1.0-SNAPSHOT/test/add")
+    suspend fun addTest(
+        @Header("Authorization") token: String,
+        @Body testRequest: TestRequest
+    ): Response<Void>
+
+    @POST("backend-1.0-SNAPSHOT/test/update")
+    suspend fun updateTest(
+        @Header("Authorization") token: String,
+        @Body testRequestUpdate: TestRequestUpdate
+    ): Response<Unit>
+
+    @DELETE("backend-1.0-SNAPSHOT/test/delete/{id}")
+    suspend fun deleteTest(
+        @Header("Authorization") token: String,
+        @Path("id") testId: Long
+    ): Response<Unit>
 }
 
 

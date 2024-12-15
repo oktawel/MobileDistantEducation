@@ -27,6 +27,10 @@
         <activity android:name=".InfoCourse" />
 
         <activity android:name=".InfoTestActivity" />
+        <activity android:name=".AddTest" />
+        <activity android:name=".EditTest" />
+        <activity android:name=".AddQuestion" />
+        <activity android:name=".AddOption" />
 
         <activity android:name=".WelcomeActivity"
             android:exported="true">

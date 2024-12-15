@@ -97,7 +97,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Создание теста"
+            android:text="Редактирование теста"
             android:textSize="34sp"
             android:textStyle="bold"
             android:fontFamily="@font/playfair_display"
@@ -120,7 +120,7 @@
             app:boxCornerRadiusTopStart="10dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/inputName"
+                android:id="@+id/editName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
@@ -142,7 +142,7 @@
             app:boxCornerRadiusTopStart="10dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/inputDescription"
+                android:id="@+id/editDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
@@ -154,45 +154,71 @@
                 android:textSize="20sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <ScrollView
+        <LinearLayout
+            android:id="@+id/toggleBooleanConteiner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:padding="8dp"
+            android:background="@drawable/rounded_border"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Статус"
+                android:textSize="18sp"
+                android:textColor="@color/colorTextInput"
+                android:layout_marginBottom="8dp"
+                android:layout_marginRight="20dp"/>
+
+            <ToggleButton
+                android:id="@+id/toggleBoolean"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorTextInput"
+                android:textOn="Открыт"
+                android:textOff="Закрыт"
+                android:checked="false"
+                android:background="@drawable/rounded_field"
+                android:textSize="16sp"
+                android:padding="10dp"/>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:background="@drawable/rounded_border">
 
-            <LinearLayout
-                android:id="@+id/containerQuestions"
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="8dp" >
+                android:layout_marginLeft="6dp"
+                android:text="Курс"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
 
-                <LinearLayout
-                    android:id="@+id/containerList"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="8dp" />
-
-                <ImageButton
-                    android:id="@+id/btnAdd"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:background="@drawable/baseline_add_circle_outline_24"
-                    android:backgroundTint="@color/button"
-                    android:layout_gravity="center"/>
-
-            </LinearLayout>
-
-        </ScrollView>
-
-
+            <Spinner
+                android:id="@+id/course"
+                android:layout_width="match_parent"
+                android:layout_height="30sp"
+                android:textSize="20sp"
+                android:background="@drawable/rounded_field_input"
+                android:spinnerMode= "dropdown"
+                android:dropDownWidth="match_parent"
+                android:popupBackground="@drawable/spinner_dropdown_border"
+                android:divider="@color/borderInput"
+                android:dividerHeight="1dp"/>
+        </LinearLayout>
 
         <Button
-            android:id="@+id/btnCreate"
+            android:id="@+id/btnEdit"
             android:layout_width="wrap_content"
             android:layout_height="70dp"
-            android:text="Создать тест"
+            android:text = "Сохранить"
             android:textSize="24dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="40dp"

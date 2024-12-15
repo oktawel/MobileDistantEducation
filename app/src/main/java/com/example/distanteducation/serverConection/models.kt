@@ -111,3 +111,38 @@ data class Test (
     val mark: Float,
     val subjectId: Long
 ): Parcelable
+
+data class TestRequest(
+    val name: String,
+    val description: String,
+    val open: Boolean,
+    val subjectId: Long,
+    val addFormQuestionList: List<QuestionRequest>
+)
+
+data class TestRequestUpdate(
+    val id: Long,
+    val name: String,
+    val description: String,
+    val open: Boolean,
+    val subjectId: Long
+)
+
+@Parcelize
+data class QuestionRequest(
+    val text: String,
+    val typeId: Long,
+    val cost: Int,
+    val addFormOptionList: List<OptionRequest>
+): Parcelable
+@Parcelize
+data class OptionRequest(
+    val text: String,
+    val correct: Boolean?
+): Parcelable
+
+data class QuestionType(val id: Int, val name: String) {
+    override fun toString(): String {
+        return name
+    }
+}
