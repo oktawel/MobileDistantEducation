@@ -117,17 +117,15 @@ class QuestionsAdapter(
                 val checkBox = CheckBox(itemView.context).apply {
                     text = option.text
                     id = option.id.toInt()
-                    isChecked = false // Сбрасываем состояние
+                    isChecked = false
                 }
                 checkBox.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {
-                        // Добавляем выбранный ответ
                         onAnswerSelected(
                             question.id,
                             OptionAnswer(optionId = option.id, textAnswer = null)
                         )
                     } else {
-                        // Удаляем ответ, если пользователь снял галочку
                         onAnswerSelected(
                             question.id,
                             OptionAnswer(optionId = option.id, textAnswer = null)
