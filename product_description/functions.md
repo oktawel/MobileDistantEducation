@@ -15,3 +15,6 @@
 
 Ознакомится с ограничениями можно [здесь](/product_description/constraints.md).
 Для описания ролей перейдите [сюда](/product_description/user_roles.md).
+
+### Макеты приложения
+[Ссылка на figma](https://www.figma.com/design/77Snp2XiAZAQuTpg8w7IBz/Untitled?node-id=0-1&node-type=canvas&t=JMxL3blHvaBUIWhm-0)
