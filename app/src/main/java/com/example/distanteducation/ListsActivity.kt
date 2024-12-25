@@ -4,10 +4,15 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -27,10 +32,16 @@ import kotlinx.coroutines.withContext
 class ListsActivity : AppCompatActivity() {
     private lateinit var btnAdd: Button
     private lateinit var viewTittle: TextView
+    private lateinit var emptyMessage: TextView
     private lateinit var type: String
     private lateinit var container: LinearLayout
     private lateinit var token: String
 
+    private var lecturerSearch = listOf("Имя", "Фамилия")
+    private var studentSearch = listOf("Имя", "Фамилия","Группа")
+    private var groupSearch = listOf("Название")
+
+    private var groupsList: MutableList<Group> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +49,7 @@ class ListsActivity : AppCompatActivity() {
 
         btnAdd = findViewById(R.id.btnAdd)
         viewTittle = findViewById(R.id.tvTitle)
+        emptyMessage = findViewById(R.id.emptyMessage)
         token = UserSession.token ?: return
         type = intent.getStringExtra("type") ?: return
 
@@ -53,8 +65,376 @@ class ListsActivity : AppCompatActivity() {
         btnBack.setOnClickListener {
             finish()
         }
+        val showDialogButton: ImageButton = findViewById(R.id.search_btn)
+        showDialogButton.setOnClickListener {
+            showModalDialog()
+        }
 
         loadData()
+    }
+
+    // Метод для отображения модального окна
+    private fun showModalDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.search_window, null)
+
+        val spinnerCriteria: Spinner = dialogView.findViewById(R.id.spinnerSearchCriteria)
+        val spinnerGroup: Spinner = dialogView.findViewById(R.id.spinnerGroup)
+        val editText: EditText = dialogView.findViewById(R.id.editText)
+
+        var criteriaAdapter: ArrayAdapter<String>? = null
+
+        when (type) {
+            "lecturer" -> {
+                criteriaAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, lecturerSearch)
+                criteriaAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                spinnerCriteria.adapter = criteriaAdapter
+            }
+            "student" -> {
+                criteriaAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, studentSearch)
+                criteriaAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                spinnerCriteria.adapter = criteriaAdapter
+
+                if (groupsList.isEmpty()){
+                    // Загружаем группы для второго выпадающего списка (если тип "student")
+                    CoroutineScope(Dispatchers.IO).launch {
+                            val response = RetrofitClient.apiService.getGroups("Bearer $token")
+                            if (response.isSuccessful) {
+                                val groups = response.body() ?: emptyList()
+                                val group = Group(id = 0, name = "Выберите группу")
+                                val mutableGroups = groups.toMutableList()
+                                mutableGroups.add(0, group)
+                                groupsList = mutableGroups
+                            } else {
+                                Log.e("showModalDialog", "Failed to load groups: ${response.code()}")
+                            }
+                    }
+                }
+                val groupNames = groupsList.map { it.name }
+
+                val groupAdapter = ArrayAdapter(
+                    this@ListsActivity,
+                    android.R.layout.simple_spinner_item,
+                    groupNames
+                )
+                groupAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                spinnerGroup.adapter = groupAdapter
+            }
+            "group" -> {
+                criteriaAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, groupSearch)
+                criteriaAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                spinnerCriteria.adapter = criteriaAdapter
+            }
+        }
+
+        // Логика отображения/скрытия EditText в зависимости от критерия поиска
+        spinnerCriteria.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedCriterion = parent?.getItemAtPosition(position).toString()
+
+                when (selectedCriterion) {
+                    "Название" -> {
+                        editText.visibility =  View.VISIBLE
+                        editText.hint = "Название"
+                        spinnerGroup.visibility =  View.GONE
+                    }
+                    "Имя" -> {
+                        editText.visibility =  View.VISIBLE
+                        editText.hint = "Имя"
+                        spinnerGroup.visibility =  View.GONE
+                    }
+                    "Фамилия" -> {
+                        editText.visibility =  View.VISIBLE
+                        editText.hint = "Фамилия"
+                        spinnerGroup.visibility =  View.GONE
+                    }
+                    "Группа" -> {
+                        editText.visibility =  View.GONE
+                        spinnerGroup.visibility =  View.VISIBLE
+                    }
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        // Создание и отображение диалога
+        val builder = AlertDialog.Builder(this)
+            .setTitle("Поиск")
+            .setView(dialogView)
+            .setNeutralButton("Очистить поиск") { dialog, _ ->
+                container.removeAllViews()
+                when (type) {
+                    "lecturer" -> loadLecturers()
+                    "student" -> loadStudents()
+                    "group" ->  loadGroups()
+                }
+                dialog.dismiss()
+            }
+            .setPositiveButton("OK") { dialog, _ ->
+                val selectedCriterion = spinnerCriteria.selectedItem.toString()
+                val inputText = editText.text.toString()
+                val selectedGroup = spinnerGroup.selectedItem?.toString()
+                container.removeAllViews()
+                when (selectedCriterion) {
+                    "Название" -> searchByName(inputText)
+                    "Имя" -> searchByName(inputText)
+                    "Фамилия" -> searchBySurname(inputText)
+                    "Группа" -> {
+                        searchByGroup(groupsList.find { it.name == selectedGroup }?.id!!)
+                    }
+                    else -> Toast.makeText(this, "Некорректный критерий поиска", Toast.LENGTH_SHORT).show()
+                }
+
+                dialog.dismiss()
+            }
+            .setNegativeButton("Отмена") { dialog, _ -> dialog.dismiss() }
+
+        builder.create().show()
+    }
+
+    private fun searchByName(query: String) {
+        container.removeAllViews()
+        when (type) {
+            "lecturer" -> {
+                if (query == ""){
+                    loadLecturers()
+                }
+                else{
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            val response = RetrofitClient.apiService.getAllLecturersByName(
+                                token ="Bearer $token",
+                                name = query
+                            )
+                            if (response.isSuccessful) {
+                                val lecturers = response.body() ?: emptyList()
+                                container.removeAllViews()
+                                if (lecturers.isEmpty()){
+                                    emptyMessage.visibility = View.VISIBLE
+                                    emptyMessage.text = "Лекторов с таким именем не найдено"
+                                }
+                                else{
+                                    withContext(Dispatchers.Main) {
+                                        for (lecturer in lecturers) {
+                                            addListLecturersView(lecturer)
+                                        }
+                                    }
+                                }
+                            } else {
+                                withContext(Dispatchers.Main) {
+                                    Log.d("Search", response.toString())
+                                }
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                Log.d("Search", e.message.toString())
+                            }
+                        }
+                    }
+                }
+            }
+            "student" -> {
+                if (query == ""){
+                    loadStudents()
+                }
+                else{
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            val response = RetrofitClient.apiService.getAllStudentsByName(
+                                token ="Bearer $token",
+                                name = query
+                            )
+                            if (response.isSuccessful) {
+                                val students = response.body() ?: emptyList()
+                                container.removeAllViews()
+                                if (students.isEmpty()){
+                                    emptyMessage.visibility = View.VISIBLE
+                                    emptyMessage.text = "Студентов с таким именем не найдено"
+                                }
+                                else{
+                                    withContext(Dispatchers.Main) {
+                                        for (student in students) {
+                                            addListStudentsView(student)
+                                        }
+                                    }
+                                }
+                            } else {
+                                withContext(Dispatchers.Main) {
+                                    Log.d("Search", response.toString())
+                                }
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                Log.d("Search", e.message.toString())
+                            }
+                        }
+                    }
+                }
+            }
+            "group" -> {
+                if (query == ""){
+                    loadGroups()
+                }
+                else{
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            val response = RetrofitClient.apiService.getAllGroupsByName(
+                                token ="Bearer $token",
+                                name = query
+                            )
+                            if (response.isSuccessful) {
+                                val groups = response.body() ?: emptyList()
+                                container.removeAllViews()
+                                if (groups.isEmpty()){
+                                    emptyMessage.visibility = View.VISIBLE
+                                    emptyMessage.text = "Групп с таким названием не найдено"
+                                }
+                                else{
+                                    withContext(Dispatchers.Main) {
+                                        for (group in groups) {
+                                            addListGroupsView(group)
+                                        }
+                                    }
+                                }
+                            } else {
+                                withContext(Dispatchers.Main) {
+                                    Log.d("Search", response.toString())
+                                }
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                Log.d("Search", e.message.toString())
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun searchBySurname(query: String) {
+        container.removeAllViews()
+        when (type) {
+            "lecturer" -> {
+                if (query == ""){
+                    loadLecturers()
+                }
+                else{
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            val response = RetrofitClient.apiService.getAllLecturersBySurname(
+                                token ="Bearer $token",
+                                surname = query
+                            )
+                            if (response.isSuccessful) {
+                                val lecturers = response.body() ?: emptyList()
+                                container.removeAllViews()
+                                if (lecturers.isEmpty()){
+                                    emptyMessage.visibility = View.VISIBLE
+                                    emptyMessage.text = "Лекторов с такой фамилией не найдено"
+                                }
+                                else{
+                                    withContext(Dispatchers.Main) {
+
+                                        for (lecturer in lecturers) {
+                                            addListLecturersView(lecturer)
+                                        }
+                                    }
+                                }
+
+                            } else {
+                                withContext(Dispatchers.Main) {
+                                    Log.d("Search", response.toString())
+                                }
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                Log.d("Search", e.message.toString())
+                            }
+                        }
+                    }
+                }
+            }
+            "student" -> {
+                if (query == ""){
+                    loadStudents()
+                }
+                else{
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            val response = RetrofitClient.apiService.getAllStudentsBySurname(
+                                token ="Bearer $token",
+                                surname = query
+                            )
+                            if (response.isSuccessful) {
+                                val students = response.body() ?: emptyList()
+                                container.removeAllViews()
+                                if (students.isEmpty()){
+                                    emptyMessage.visibility = View.VISIBLE
+                                    emptyMessage.text = "Студентов с такой фамилией не найдено"
+                                }
+                                else{
+                                    withContext(Dispatchers.Main) {
+                                        for (student in students) {
+                                            addListStudentsView(student)
+                                        }
+                                    }
+                                }
+
+                            } else {
+                                withContext(Dispatchers.Main) {
+                                    Log.d("Search", response.toString())
+                                }
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                Log.d("Search", e.message.toString())
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun searchByGroup(groupId: Long) {
+        container.removeAllViews()
+        if (groupId == 0.toLong()){
+            loadStudents()
+        }
+        else{
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val response = RetrofitClient.apiService.getAllStudentsByGroup(
+                        token ="Bearer $token",
+                        id = groupId
+                    )
+                    if (response.isSuccessful) {
+                        val students = response.body() ?: emptyList()
+                        container.removeAllViews()
+                        if (students.isEmpty()){
+                            emptyMessage.visibility = View.VISIBLE
+                            emptyMessage.text = "Студентов с такой группой не найдено"
+                        }
+                        else{
+                            withContext(Dispatchers.Main) {
+                                for (student in students) {
+                                    addListStudentsView(student)
+                                }
+                            }
+                        }
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            Log.d("Search", response.toString())
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        Log.d("Search", e.message.toString())
+                    }
+                }
+            }
+        }
     }
 
 
@@ -108,7 +488,7 @@ class ListsActivity : AppCompatActivity() {
         btnAdd.setOnClickListener {
             startAdd()
         }
-
+        emptyMessage.visibility = View.GONE
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = RetrofitClient.apiService.getLecturers("Bearer $token")
@@ -148,7 +528,7 @@ class ListsActivity : AppCompatActivity() {
         btnAdd.setOnClickListener {
             startAdd()
         }
-
+        emptyMessage.visibility = View.GONE
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = RetrofitClient.apiService.getStudents("Bearer $token")
@@ -188,7 +568,7 @@ class ListsActivity : AppCompatActivity() {
         btnAdd.setOnClickListener {
             startAdd()
         }
-
+        emptyMessage.visibility = View.GONE
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = RetrofitClient.apiService.getGroups("Bearer $token")
@@ -224,6 +604,7 @@ class ListsActivity : AppCompatActivity() {
 
 
     private fun addListLecturersView(lecturer: Lecturer) {
+
         val lecturerLayout = createLayoutLecturer(lecturer)
 
         val textView = createTextField(lecturer.id, lecturer.name, lecturer.surname)
@@ -238,6 +619,7 @@ class ListsActivity : AppCompatActivity() {
     }
 
     private fun addListStudentsView(student: Student) {
+
         val lecturerLayout = createLayoutStudent(student)
 
         val textView = createTextField(student.id, student.name, student.surname)
@@ -252,6 +634,7 @@ class ListsActivity : AppCompatActivity() {
     }
 
     private fun addListGroupsView(group: Group) {
+
         val lecturerLayout = createLayoutGroup(group)
 
         val textView = createTextField(group.id, group.name, "")

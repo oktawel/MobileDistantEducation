@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Выпадающий список для выбора критерия поиска -->
+    <Spinner
+        android:id="@+id/spinnerSearchCriteria"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/rounded_select_input"
+        android:backgroundTint="@color/field_text"
+        android:paddingVertical="10dp"/>
+
+    <!-- Выпадающий список для выбора группы -->
+    <Spinner
+        android:id="@+id/spinnerGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/rounded_select_input"
+        android:backgroundTint="@color/field_text"
+        android:paddingVertical="10dp"/>
+
+    <!-- Поле для ввода текста -->
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Введите текст"
+        android:background="@drawable/rounded_border"
+        android:padding="10dp"
+        android:backgroundTint="@color/field_text"
+        />
+</LinearLayout>

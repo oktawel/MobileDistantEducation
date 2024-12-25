@@ -190,6 +190,45 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Query("testId") testId: Long
     ): Response<List<MarkStudent>>
+
+
+
+    @GET("backend-1.0-SNAPSHOT/admin/lecturersByName")
+    suspend fun getAllLecturersByName(
+        @Header("Authorization") token: String,
+        @Query("name") name: String
+    ): Response<List<Lecturer>>
+
+    @GET("backend-1.0-SNAPSHOT/admin/lecturersBySurname")
+    suspend fun getAllLecturersBySurname(
+        @Header("Authorization") token: String,
+        @Query("surname") surname: String
+    ): Response<List<Lecturer>>
+
+    @GET("backend-1.0-SNAPSHOT/admin/studentsByName")
+    suspend fun getAllStudentsByName(
+        @Header("Authorization") token: String,
+        @Query("name") name: String
+    ): Response<List<Student>>
+
+    @GET("backend-1.0-SNAPSHOT/admin/studentsBySurname")
+    suspend fun getAllStudentsBySurname(
+        @Header("Authorization") token: String,
+        @Query("surname") surname: String
+    ): Response<List<Student>>
+
+    @GET("backend-1.0-SNAPSHOT/admin/studentsByGroup")
+    suspend fun getAllStudentsByGroup(
+        @Header("Authorization") token: String,
+        @Query("id") id: Long
+    ): Response<List<Student>>
+
+    @GET("backend-1.0-SNAPSHOT/admin/groupsByName")
+    suspend fun getAllGroupsByName(
+        @Header("Authorization") token: String,
+        @Query("name") name: String
+    ): Response<List<Group>>
+
 }
 
 
