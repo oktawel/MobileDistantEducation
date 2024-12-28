@@ -134,6 +134,7 @@ class ExecuteTest : AppCompatActivity() {
                     if (optionAnswer.optionId != null) {
                         removeIf { it.optionId != null } // Удаляем предыдущий выбор
                     }
+                    Log.d("question", optionAnswer.toString())
                     if (optionAnswer.textAnswer != null) {
                         removeIf { it.textAnswer != null } // Удаляем старые текстовые ответы
                     }

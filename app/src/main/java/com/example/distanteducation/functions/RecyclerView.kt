@@ -144,11 +144,21 @@ class QuestionsAdapter(
         private val radioGroup: RadioGroup = itemView.findViewById(R.id.radioGroupTrueFalse)
 
         fun bind(question: QuestionExecute, onAnswerSelected: (Long, OptionAnswer) -> Unit) {
+            val correctOption = question.options?.find { it.correct }
+
             questionText.text = question.text
             radioGroup.setOnCheckedChangeListener { _, checkedId ->
-                val isTrue = checkedId == R.id.radioTrue
-                val optionId = question.options?.find { it.correct == isTrue }?.id
-                onAnswerSelected(question.id, OptionAnswer(optionId = optionId, textAnswer = null))
+
+                if (correctOption!!.id == 1L){
+                    val isTrue = checkedId == R.id.radioTrue
+                    val optionId = question.options?.find { it.correct == isTrue }?.id
+                    onAnswerSelected(question.id, OptionAnswer(optionId = optionId, textAnswer = null))
+                }
+                else if(correctOption.id == 3L){
+                    val isTrue = checkedId == R.id.radioFalse
+                    val optionId = question.options?.find { it.correct == isTrue }?.id
+                    onAnswerSelected(question.id, OptionAnswer(optionId = optionId, textAnswer = null))
+                }
             }
         }
     }
